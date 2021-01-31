@@ -12,7 +12,7 @@ interface SettlementValues {
   fillSB: string;
   fillBB: string;
   feeB: string;
-  protocolFeeB: string;
+  // protocolFeeB: string;
 }
 
 /**
@@ -90,7 +90,7 @@ export class SpotTradeProcessor {
       tokenB,
       fillSB: s.fillSB,
       feeB: s.feeB,
-      protocolFeeB: s.protocolFeeB
+      // protocolFeeB: s.protocolFeeB
     };
 
     return trade;
@@ -127,7 +127,7 @@ export class SpotTradeProcessor {
       fillSB:fillSB.toString(),
       fillBB:fillBB.toString(),
       feeB:feeB.toString(),
-      protocolFeeB:protocolFeeB.toString()
+      // protocolFeeB:protocolFeeB.toString()
     };
     return settlementValues;
   }

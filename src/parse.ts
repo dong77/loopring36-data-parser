@@ -20,32 +20,17 @@ const infuraUrlMain = "https://mainnet.infura.io/v3/a06ed9c6b5424b61beafff27ecc3
 const provider = new PrivateKeyProvider(testAccountPrivKey, infuraUrlMain);
 const web3 = new Web3(provider);
 
-async function parseLoopringSubmitBlocksTx(txHash: string) {
-  const exchangeAddress = "0x0BABA1Ad5bE3a5C0a66E7ac838a129Bf948f1eA4";
-  const owner = "0x5c367c1b2603ed166C62cEc0e4d47e9D5DC1c073";
-  const submitBlocksFunctionSignature = "0xdcb2aa31"; // submitBlocksWithCallbacks
+async function parseLoopringSubmitBlocksTx(transaction: any) {
 
-  const transaction = await web3.eth.getTransaction(txHash);
+  console.log('==========');
+  console.log(transaction);
 
-  if (transaction.input.startsWith(submitBlocksFunctionSignature)) {
+
     const decodedInput = web3.eth.abi.decodeParameters(
       [
         "bool",
         "bytes",
         "bytes"
-        /*{
-          "struct CallbackConfig": {
-          "struct BlockCallback[]": {
-          "struct TxCallback[]": {
-          txIdx: "uint16",
-          receiverIdx: "uint16",
-          data: "bytes"
-          },
-          blockIdx: "uint16"
-          },
-          receivers: "address[]"
-          }
-          }*/
       ],
       "0x" + transaction.input.slice(2 + 4 * 2)
     );
@@ -90,45 +75,29 @@ async function parseLoopringSubmitBlocksTx(txHash: string) {
         return;
       }
 
-      const merkleRoot = bs.extractUint(20 + 32).toString(10);
+      const merkleRoot = bs.extractUint(20 + 32);
       // console.log("merkleRoot: " + merkleRoot);
 
       // Create the block
       const newBlock = {
-        exchange: exchangeAddress,
         blockIdx: i,
         blockType,
         blockSize,
         blockVersion,
         data,
         offchainData,
-        operator: owner,
         origin: transaction.from,
-        blockFee: new BN(0),
+        blockFee: new BN(0).toString(),
         merkleRoot,
         timestamp: 0,
         numRequestsProcessed: 0,
         totalNumRequestsProcessed: 0,
-        transactionHash: txHash
       };
 
-      console.log("newBlock:", newBlock);
-      processBlock(newBlock);
+      // console.log("newBlock:", newBlock);
+      return processBlock(newBlock);
     }
-  } else {
-    console.log("tx " + txHash + " was committed with an unsupported function signature");
-  }
-}
 
-async function getInputData(txHash: string) {
-  return (await web3.eth.getTransaction(txHash)).input;
-}
-
-function decodeInputDate(data: string) {
-  const decoder = new InputDataDecoder("ABI/version36/LoopringIOExchangeOwner.abi");
-  const decoded = decoder.decodeData(data);
-  console.log("result:", JSON.stringify(decoded, undefined, 2));
-  return decoded;
 }
 
 function processBlock(block: any) {
@@ -186,7 +155,7 @@ function processBlock(block: any) {
       console.log("unknown transaction type: " + txType, "; txData:", txData.getData());
     }
     request.type = TransactionType[txType];
-    request.txData = txData.getData();
+    // request.txData = txData.getData();
 
     requests.push(request);
   }
@@ -195,12 +164,4 @@ function processBlock(block: any) {
   return requests;
 }
 
-
-async function main() {
-  const testTxHash = "0xe97d7e19f80e474ef4637b950a0320440fbc94442f406ec2347e9d98b362e480";
-  await parseLoopringSubmitBlocksTx(testTxHash);
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch((err) => console.error(err))
+export { parseLoopringSubmitBlocksTx};

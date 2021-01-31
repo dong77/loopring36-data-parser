@@ -8,7 +8,7 @@ interface AccountUpdate {
   owner?: string;
   accountID?: number;
   feeTokenID?: number;
-  fee?: BN;
+  fee?: string
   publicKeyX?: string;
   publicKeyY?: string;
   validUntil?: number;
@@ -34,7 +34,7 @@ export class AccountUpdateProcessor {
     update.fee = fromFloat(
       data.extractUint16(offset),
       Constants.Float16Encoding
-    );
+    ).toString();
     offset += 2;
     const publicKey = data.extractData(offset, 32);
     offset += 32;

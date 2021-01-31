@@ -6,7 +6,7 @@ interface Deposit {
   to?: string;
   toAccountID?: number;
   tokenID?: number;
-  amount?: BN;
+  amount?: string
 }
 
 /**
@@ -24,7 +24,7 @@ export class DepositProcessor {
     offset += 4;
     deposit.tokenID = data.extractUint16(offset);
     offset += 2;
-    deposit.amount = data.extractUint96(offset);
+    deposit.amount = data.extractUint96(offset).toString();
     offset += 12;
 
     return deposit;

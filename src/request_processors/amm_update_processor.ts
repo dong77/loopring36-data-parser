@@ -7,9 +7,9 @@ interface AmmUpdate {
   accountID?: number;
   tokenID?: number;
   feeBips?: number;
-  tokenWeight?: BN;
+  tokenWeight?: string
   nonce?: number;
-  balance?: BN;
+  balance?: string
 }
 
 /**
@@ -29,11 +29,11 @@ export class AmmUpdateProcessor {
     offset += 2;
     update.feeBips = data.extractUint8(offset);
     offset += 1;
-    update.tokenWeight = data.extractUint96(offset);
+    update.tokenWeight = data.extractUint96(offset).toString();
     offset += 12;
     update.nonce = data.extractUint32(offset);
     offset += 4;
-    update.balance = data.extractUint96(offset);
+    update.balance = data.extractUint96(offset).toString();
     offset += 12;
 
     return update;

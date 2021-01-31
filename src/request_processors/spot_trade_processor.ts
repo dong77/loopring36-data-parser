@@ -4,15 +4,15 @@ import { Constants } from "../constants";
 import { fromFloat } from "../float";
 
 interface SettlementValues {
-  fillSA: BN;
-  fillBA: BN;
-  feeA: BN;
-  protocolFeeA: BN;
+  fillSA: string;
+  fillBA: string;
+  feeA: string;
+  protocolFeeA: string;
 
-  fillSB: BN;
-  fillBB: BN;
-  feeB: BN;
-  protocolFeeB: BN;
+  fillSB: string;
+  fillBB: string;
+  feeB: string;
+  protocolFeeB: string;
 }
 
 /**
@@ -119,15 +119,15 @@ export class SpotTradeProcessor {
     );
 
     const settlementValues: SettlementValues = {
-      fillSA,
-      fillBA,
-      feeA,
-      protocolFeeA,
+      fillSA:fillSA.toString(),
+      fillBA:fillBA.toString(),
+      feeA:feeA.toString(),
+      protocolFeeA:protocolFeeA.toString(),
 
-      fillSB,
-      fillBB,
-      feeB,
-      protocolFeeB
+      fillSB:fillSB.toString(),
+      fillBB:fillBB.toString(),
+      feeB:feeB.toString(),
+      protocolFeeB:protocolFeeB.toString()
     };
     return settlementValues;
   }

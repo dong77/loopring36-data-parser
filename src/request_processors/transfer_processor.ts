@@ -7,9 +7,9 @@ interface Transfer {
   accountFromID?: number;
   accountToID?: number;
   tokenID?: number;
-  amount?: BN;
+  amount?: string
   feeTokenID?: number;
-  fee?: BN;
+  fee?: string
   validUntil?: number;
   storageID?: number;
   from?: string;
@@ -38,14 +38,14 @@ export class TransferProcessor {
     transfer.amount = fromFloat(
       data.extractUint24(offset),
       Constants.Float24Encoding
-    );
+    ).toString();
     offset += 3;
     transfer.feeTokenID = data.extractUint16(offset);
     offset += 2;
     transfer.fee = fromFloat(
       data.extractUint16(offset),
       Constants.Float16Encoding
-    );
+    ).toString();
     offset += 2;
     transfer.storageID = data.extractUint32(offset);
     offset += 4;

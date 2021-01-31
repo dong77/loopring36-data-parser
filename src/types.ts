@@ -58,7 +58,7 @@ export interface Block {
   origin: string;
 
   /** The block fee received for this block (in ETH). */
-  blockFee: BN;
+  blockFee: string
 
   /** The Merkle root of the Merkle tree after doing all requests in the block. */
   merkleRoot: string;
@@ -109,9 +109,9 @@ export interface Deposit {
   /** The token that was deposited. */
   token: number;
   /** The amount that was deposited. */
-  amount: BN;
+  amount: string
   /** The fee paid for the deposit. */
-  fee: BN;
+  fee: string
 
   /** The Ethereum transaction in which this deposit was done. */
   transactionHash: string;
@@ -138,9 +138,9 @@ export interface OnchainWithdrawal {
   /** The token that is being withdrawn. */
   tokenID: number;
   /** The amount that was requested to be withdrawn. */
-  amountRequested: BN;
+  amountRequested: string
   /** If the request was processed: The amount that was actually withdrawn. */
-  amountWithdrawn?: BN;
+  amountWithdrawn?: string
 
   /** The Ethereum transaction in which this on-chain withdrawal was done. */
   transactionHash: string;
@@ -166,11 +166,11 @@ export interface SpotTrade {
   /** The token the taker order sells. */
   tokenA: number;
   /** The amount of tokens (in tokenS) the taker sells. */
-  fillSA: BN;
+  fillSA: string
   /** The fee (in tokenB) paid by the taker. */
-  feeA: BN;
+  feeA: string
   /** The protocol fee that needs to be paid by the operator for the taker. */
-  protocolFeeA: BN;
+  protocolFeeA: string
 
   /** The account of the maker. */
   accountIdB: number;
@@ -181,11 +181,11 @@ export interface SpotTrade {
   /** The token the maker order sells. */
   tokenB: number;
   /** The amount of tokens (in tokenS) the maker sells. */
-  fillSB: BN;
+  fillSB: string
   /** The fee (in tokenB) paid by the maker. */
-  feeB: BN;
+  feeB: string
   /** The protocol fee that needs to be paid by the operator for the maker. */
-  protocolFeeB: BN;
+  protocolFeeB: string
 }
 
 /**
@@ -204,11 +204,11 @@ export interface OffchainWithdrawal {
   /** The token that is being withdrawn. */
   tokenID: number;
   /** The amount that was actually withdrawn. */
-  amountWithdrawn: BN;
+  amountWithdrawn: string
   /** The token the fee to the operator is paid in. */
   feeTokenID: number;
   /** The fee paid to the operator. */
-  fee: BN;
+  fee: string
 }
 
 /**
@@ -231,7 +231,7 @@ export interface OrderCancellation {
   /** The token the fee to the operator is paid in. */
   feeTokenID: number;
   /** The fee paid to the operator. */
-  fee: BN;
+  fee: string
 }
 
 /**
@@ -252,11 +252,11 @@ export interface InternalTransfer {
   /** The token that is being transferred. */
   tokenID: number;
   /** The amount that was actually withdrawn. */
-  amount: BN;
+  amount: string
   /** The token the fee to the operator is paid in. */
   feeTokenID: number;
   /** The fee paid to the operator. */
-  fee: BN;
+  fee: string
   /** The type of the transfer. */
   type: number;
 }
@@ -266,7 +266,7 @@ export interface InternalTransfer {
  */
 export interface Storage {
   /** The data field. */
-  data: BN;
+  data: string
   /** The storageID of the data that is currently stored for. */
   storageID: number;
 }

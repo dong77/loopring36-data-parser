@@ -7,7 +7,7 @@ interface SettlementValues {
   fillSA: string;
   fillBA: string;
   feeA: string;
-  protocolFeeA: string;
+  // protocolFeeA: string;
 
   fillSB: string;
   fillBB: string;
@@ -82,7 +82,7 @@ export class SpotTradeProcessor {
       tokenA,
       fillSA: s.fillSA,
       feeA: s.feeA,
-      protocolFeeA: s.protocolFeeA,
+      // protocolFeeA: s.protocolFeeA,
 
       accountIdB,
       orderIdB: storageIdB,
@@ -122,7 +122,7 @@ export class SpotTradeProcessor {
       fillSA:fillSA.toString(),
       fillBA:fillBA.toString(),
       feeA:feeA.toString(),
-      protocolFeeA:protocolFeeA.toString(),
+      // protocolFeeA:protocolFeeA.toString(),
 
       fillSB:fillSB.toString(),
       fillBB:fillBB.toString(),

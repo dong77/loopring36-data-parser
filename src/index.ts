@@ -65,6 +65,9 @@ const client = new MongoClient(dbUrl);
     // });
 
     const txs = await parseLoopringSubmitBlocksTx(tx);
+    txs.forEach((tx) =>{
+       tx.block = dexBlock.dexBlockIndex;
+    })
 
    // await client.db.collection("transactions").inserMany(txs, function(err, res) {
       // if (err) throw err;

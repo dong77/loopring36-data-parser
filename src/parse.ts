@@ -22,10 +22,6 @@ const web3 = new Web3(provider);
 
 async function parseLoopringSubmitBlocksTx(transaction: any) {
 
-  console.log('==========');
-  console.log(transaction);
-
-
     const decodedInput = web3.eth.abi.decodeParameters(
       [
         "bool",
@@ -160,7 +156,6 @@ function processBlock(block: any) {
     requests.push(request);
   }
 
-  console.log("requests:", requests);
   return requests;
 }
 

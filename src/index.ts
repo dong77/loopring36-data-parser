@@ -20,11 +20,8 @@ const BN = web3.utils.BN;
 const { parseLoopringSubmitBlocksTx } = require("./parse.ts");
 
 const MongoClient = require("mongodb").MongoClient;
-const dbUrl =
-  "mongodb+srv://localhost:27017/";
+const dbUrl = "mongodb://localhost:27017/";
 const client = new MongoClient(dbUrl);
-
-// client.connect();
 
   const onEvent = async (error, event) => {
     const block = await web3.eth.getBlock(event.blockNumber);
@@ -32,7 +29,7 @@ const client = new MongoClient(dbUrl);
 
     const dexBlock = { ...event, ...tx };
 
-    dexBlock.dexBlockIndex = parseInt(
+    dexBlock._id = parseInt(
       new BN(dexBlock.topics[1].substring(2)).toString()
     );
     dexBlock.dexMerkelRoot = dexBlock.data.substring(0, 64 + 2);
@@ -56,27 +53,35 @@ const client = new MongoClient(dbUrl);
     delete dexBlock.to;
     delete dexBlock.from;
 
-      // const options = { upsert: true };
+const query = { _id: dexBlock._id };
+const update = { $set: dexBlock};
+const options = { upsert: true };
 
-   // await client.db.collection("blocks").updateOne(dexBlock, function (err, res) {
-      // if (err) throw err;
-      console.log(dexBlock);
-      console.log("--------------------");
-    // });
+   await client.db("main").collection("blocks").updateOne(query, update, options);
 
     const txs = await parseLoopringSubmitBlocksTx(tx);
-    txs.forEach((tx) =>{
-       tx.block = dexBlock.dexBlockIndex;
+    txs.forEach(async (tx, idx) =>{
+      tx._id = dexBlock._id * 1000 + idx;
+      tx.block = dexBlock._id;
+
+      const query = { _id: tx._id };
+      const update = { $set: tx};
+      const options = { upsert: true };
+
+       await client.db("main").collection("transactions").updateOne(query, update, options);
     })
 
-   // await client.db.collection("transactions").inserMany(txs, function(err, res) {
-      // if (err) throw err;
-      console.log(txs);
-      console.log("==================");
-    // });
   };
 
-  var subscription = web3.eth.subscribe(
+
+
+const main = async () =>{
+  await client.connect();
+  await client.db("main").createCollection("blocks").catch((error)=>{})
+  await client.db("main").createCollection("transactions").catch((error)=>{})
+
+
+  const subscription = web3.eth.subscribe(
     "logs",
     {
       fromBlock: startBlock,
@@ -85,3 +90,7 @@ const client = new MongoClient(dbUrl);
     },
     onEvent
   );
+}
+
+main();
+console.log("end")

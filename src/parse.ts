@@ -135,10 +135,12 @@ function processBlock(block: any) {
       request = WithdrawalProcessor.extractData(txData)
     } else if (txType === TransactionType.ACCOUNT_UPDATE) {
       request = AccountUpdateProcessor.extractData(txData)
+      // console.log(request);
     } else if (txType === TransactionType.AMM_UPDATE) {
       request = AmmUpdateProcessor.extractData(txData)
     } else if (txType === TransactionType.SPOT_TRADE) {
       request = SpotTradeProcessor.extractData(txData)
+    } else if (txType === TransactionType.SIGNATURE_VERIFICATION) {
     } else {
       // assert(false, "unknown transaction type: " + txType);
       console.log(
@@ -148,6 +150,7 @@ function processBlock(block: any) {
       )
     }
     request.type = TransactionType[txType]
+    // request.data = txData;
     // request.txData = txData.getData();
 
     if (request !== {}) {

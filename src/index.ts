@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-
+import { TransactionType } from './types'
 const mongo = require('mongodb')
 
 const awsGeth =
@@ -22,6 +22,7 @@ const { parseLoopringSubmitBlocksTx } = require('./parse.ts')
 const MongoClient = require('mongodb').MongoClient
 const dbUrl = 'mongodb://localhost:27017/'
 const client = new MongoClient(dbUrl)
+const dbname = 'explorer'
 
 const onEvent = async (error, event) => {
   const block = await web3.eth.getBlock(event.blockNumber)
@@ -55,7 +56,7 @@ const onEvent = async (error, event) => {
   const update = { $set: dexBlock }
   const options = { upsert: true }
 
-  await client.db('main').collection('blocks').updateOne(query, update, options)
+  await client.db(dbname).collection('blocks').updateOne(query, update, options)
 
   const txs = await parseLoopringSubmitBlocksTx(tx)
   txs.forEach(async (tx, idx) => {
@@ -67,21 +68,38 @@ const onEvent = async (error, event) => {
     const options = { upsert: true }
 
     await client
-      .db('main')
+      .db(dbname)
       .collection('transactions')
       .updateOne(query, update, options)
+
+    if (tx.type === TransactionType[TransactionType.DEPOSIT]) {
+      console.log(tx)
+      const account = {
+        address: tx.to,
+        _id: tx.toAccountID,
+      }
+
+      await client
+        .db(dbname)
+        .collection('accounts')
+        .updateOne({ _id: account._id }, { $set: account }, options)
+    }
   })
 }
 
 const main = async () => {
   await client.connect()
   await client
-    .db('main')
+    .db(dbname)
     .createCollection('blocks')
     .catch((error) => {})
   await client
-    .db('main')
+    .db(dbname)
     .createCollection('transactions')
+    .catch((error) => {})
+  await client
+    .db(dbname)
+    .createCollection('accounts')
     .catch((error) => {})
 
   const subscription = web3.eth.subscribe(

@@ -22,7 +22,9 @@ const { parseLoopringSubmitBlocksTx } = require('./parse.ts')
 const MongoClient = require('mongodb').MongoClient
 const dbUrl = 'mongodb://localhost:27017/'
 const client = new MongoClient(dbUrl)
-const dbname = 'explorer'
+const dbname = 'explorer4'
+
+const zeroAddr = '0x0000000000000000000000000000000000000000'
 
 const onEvent = async (error, event) => {
   const block = await web3.eth.getBlock(event.blockNumber)
@@ -59,6 +61,7 @@ const onEvent = async (error, event) => {
   await client.db(dbname).collection('blocks').updateOne(query, update, options)
 
   const txs = await parseLoopringSubmitBlocksTx(tx)
+
   txs.forEach(async (tx, idx) => {
     tx._id = dexBlock._id * 1000 + idx
     tx.block = dexBlock._id
@@ -72,17 +75,47 @@ const onEvent = async (error, event) => {
       .collection('transactions')
       .updateOne(query, update, options)
 
+    // ------------- update account bindings -------------
+
+    let newAccount = {
+      address: zeroAddr,
+      _id: undefined,
+    }
+
     if (tx.type === TransactionType[TransactionType.DEPOSIT]) {
-      console.log(tx)
-      const account = {
+      newAccount = {
         address: tx.to,
         _id: tx.toAccountID,
       }
+      if (newAccount.address === zeroAddr) {
+        console.log(tx)
+      }
+    } else if (tx.type === TransactionType[TransactionType.TRANSFER]) {
+      newAccount = {
+        address: tx.to,
+        _id: tx.accountToID,
+      }
+    } else if (tx.type === TransactionType[TransactionType.ACCOUNT_UPDATE]) {
+      newAccount = {
+        address: tx.owner,
+        _id: tx.accountID,
+      }
 
+      if (newAccount.address === zeroAddr) {
+        console.log(tx)
+      }
+    }
+
+    if (
+      newAccount.address !== zeroAddr &&
+      newAccount.address !== null &&
+      newAccount._id !== undefined &&
+      newAccount._id !== null
+    ) {
       await client
         .db(dbname)
         .collection('accounts')
-        .updateOne({ _id: account._id }, { $set: account }, options)
+        .updateOne({ _id: newAccount._id }, { $set: newAccount }, options)
     }
   })
 }
@@ -100,6 +133,10 @@ const main = async () => {
   await client
     .db(dbname)
     .createCollection('accounts')
+    .catch((error) => {})
+  await client
+    .db(dbname)
+    .createCollection('balances')
     .catch((error) => {})
 
   const subscription = web3.eth.subscribe(

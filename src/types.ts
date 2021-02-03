@@ -1,11 +1,11 @@
-import * as BN from "bn.js";
-import { Constants } from "./constants";
+import * as BN from 'bn.js'
+import { Constants } from './constants'
 
 /**
  * The block type.
  */
 export enum BlockType {
-  UNIVERSAL = 0
+  UNIVERSAL = 0,
 }
 
 /**
@@ -19,7 +19,7 @@ export enum TransactionType {
   SPOT_TRADE,
   ACCOUNT_UPDATE,
   AMM_UPDATE,
-  SIGNATURE_VERIFICATION
+  SIGNATURE_VERIFICATION,
 }
 
 /**
@@ -29,7 +29,7 @@ export enum ForgeMode {
   AUTO_UPGRADABLE = 0,
   MANUAL_UPGRADABLE,
   PROXIED,
-  NATIVE
+  NATIVE,
 }
 
 /**
@@ -37,43 +37,43 @@ export enum ForgeMode {
  */
 export interface Block {
   /** The exchange the block was committed on. */
-  exchange: string;
+  exchange: string
   /** The block index of the block. */
-  blockIdx: number;
+  blockIdx: number
 
   /** The type of requests handled in the block. */
-  blockType: number;
+  blockType: number
   /** The block size (in number of requests). */
-  blockSize: number;
+  blockSize: number
   /** The block version. */
-  blockVersion: number;
+  blockVersion: number
   /** The data for the block. */
-  data: string;
+  data: string
   /** The custom data for the block. */
-  offchainData: string;
+  offchainData: string
 
   /** The operator when the block was committed (msg.sender). */
-  operator: string;
+  operator: string
   /** The sender of the block (tx.origin). Can be different from `operator` when an operator contract is used. */
-  origin: string;
+  origin: string
 
   /** The block fee received for this block (in ETH). */
   blockFee: string
 
   /** The Merkle root of the Merkle tree after doing all requests in the block. */
-  merkleRoot: string;
+  merkleRoot: string
 
   /** The time the block was submitted. */
-  timestamp: number;
+  timestamp: number
 
   /** The number of requests processed in this block. For on-chain request blocks this can differ from `blockSize`. */
-  numRequestsProcessed: number;
+  numRequestsProcessed: number
 
   /** The total number of requests that were processed up to, and including, this block. */
-  totalNumRequestsProcessed: number;
+  totalNumRequestsProcessed: number
 
   /** The Ethereum transaction in which this block was committed. */
-  transactionHash: string;
+  transactionHash: string
 }
 
 /**
@@ -81,13 +81,13 @@ export interface Block {
  */
 export interface Token {
   /** The exchange of the token. */
-  exchange: string;
+  exchange: string
   /** The tokenID of the token. */
-  tokenID: number;
+  tokenID: number
   /** The address of the token contract. */
-  address: string;
+  address: string
   /** Whether deposits are enabled/disabled for this token. */
-  enabled: boolean;
+  enabled: boolean
 }
 
 /**
@@ -95,26 +95,26 @@ export interface Token {
  */
 export interface Deposit {
   /** The exchange this deposit is on. */
-  exchange: string;
+  exchange: string
   /** If the request was processed: The block this deposit was pocessed in. */
-  blockIdx?: number;
+  blockIdx?: number
   /** If the request was processed: The request index of this deposit in the processed requests list. */
-  requestIdx?: number;
+  requestIdx?: number
 
   /** The time this deposit was done on-chain. */
-  timestamp: number;
+  timestamp: number
 
   /** The account this deposit is for. */
-  owner: string;
+  owner: string
   /** The token that was deposited. */
-  token: number;
+  token: number
   /** The amount that was deposited. */
   amount: string
   /** The fee paid for the deposit. */
   fee: string
 
   /** The Ethereum transaction in which this deposit was done. */
-  transactionHash: string;
+  transactionHash: string
 }
 
 /**
@@ -122,28 +122,28 @@ export interface Deposit {
  */
 export interface OnchainWithdrawal {
   /** The exchange this on-chain withdrawal is on. */
-  exchange: string;
+  exchange: string
   /** If the request was processed: The block this on-chain withdrawal was pocessed in. */
-  blockIdx?: number;
+  blockIdx?: number
   /** If the request was processed: The request index of this on-chain withdrawal in the processed requests list (@see getProcessedRequest). */
-  requestIdx?: number;
+  requestIdx?: number
 
   /** The on-chain withdrawal index (in the queue on-chain, @see getDeposit). */
-  withdrawalIdx: number;
+  withdrawalIdx: number
   /** The time this on-chain withdrawal was done on-chain. */
-  timestamp: number;
+  timestamp: number
 
   /** The account this on-chain withdrawal is for. */
-  accountID: number;
+  accountID: number
   /** The token that is being withdrawn. */
-  tokenID: number;
+  tokenID: number
   /** The amount that was requested to be withdrawn. */
   amountRequested: string
   /** If the request was processed: The amount that was actually withdrawn. */
   amountWithdrawn?: string
 
   /** The Ethereum transaction in which this on-chain withdrawal was done. */
-  transactionHash: string;
+  transactionHash: string
 }
 
 /**
@@ -151,20 +151,20 @@ export interface OnchainWithdrawal {
  */
 export interface SpotTrade {
   /** The exchange the trade was made on. */
-  exchange: string;
+  exchange: string
   /** The block this trade was pocessed in. */
-  blockIdx: number;
+  blockIdx: number
   /** The request index of this trade in the processed requests list (@see getProcessedRequest). */
-  requestIdx: number;
+  requestIdx: number
 
   /** The account of the taker. */
-  accountIdA: number;
+  accountIdA: number
   /** The orderID of the taker order. */
-  orderIdA: number;
+  orderIdA: number
   /** Whether the taker order is a buy or sell order. */
-  fillAmountBorSA: boolean;
+  fillAmountBorSA: boolean
   /** The token the taker order sells. */
-  tokenA: number;
+  tokenA: number
   /** The amount of tokens (in tokenS) the taker sells. */
   fillSA: string
   /** The fee (in tokenB) paid by the taker. */
@@ -173,13 +173,13 @@ export interface SpotTrade {
   protocolFeeA: string
 
   /** The account of the maker. */
-  accountIdB: number;
+  accountIdB: number
   /** The orderID of the maker order. */
-  orderIdB: number;
+  orderIdB: number
   /** Whether the maker order is a buy or sell order. */
-  fillAmountBorSB: boolean;
+  fillAmountBorSB: boolean
   /** The token the maker order sells. */
-  tokenB: number;
+  tokenB: number
   /** The amount of tokens (in tokenS) the maker sells. */
   fillSB: string
   /** The fee (in tokenB) paid by the maker. */
@@ -193,20 +193,20 @@ export interface SpotTrade {
  */
 export interface OffchainWithdrawal {
   /** The exchange the off-chain withdrawal request was made on. */
-  exchange: string;
+  exchange: string
   /** The block this off-chain withdrawal request was pocessed in. */
-  blockIdx: number;
+  blockIdx: number
   /** The request index of this off-chain withdrawal in the processed requests list (@see getProcessedRequest). */
-  requestIdx: number;
+  requestIdx: number
 
   /** The account this withdrawal is for. */
-  accountID: number;
+  accountID: number
   /** The token that is being withdrawn. */
-  tokenID: number;
+  tokenID: number
   /** The amount that was actually withdrawn. */
   amountWithdrawn: string
   /** The token the fee to the operator is paid in. */
-  feeTokenID: number;
+  feeTokenID: number
   /** The fee paid to the operator. */
   fee: string
 }
@@ -216,20 +216,20 @@ export interface OffchainWithdrawal {
  */
 export interface OrderCancellation {
   /** The exchange the order cancellation request was made on. */
-  exchange: string;
+  exchange: string
   /** The block this order cancellation request was pocessed in. */
-  blockIdx: number;
+  blockIdx: number
   /** The request index of this oorder cancellation in the processed requests list (@see getProcessedRequest). */
-  requestIdx: number;
+  requestIdx: number
 
   /** The account this order cancellation is for. */
-  accountID: number;
+  accountID: number
   /** The tokenS of the order that is being cancelled. */
-  orderTokenID: number;
+  orderTokenID: number
   /** The orderID of the order that is being cancelled. */
-  orderID: number;
+  orderID: number
   /** The token the fee to the operator is paid in. */
-  feeTokenID: number;
+  feeTokenID: number
   /** The fee paid to the operator. */
   fee: string
 }
@@ -239,26 +239,26 @@ export interface OrderCancellation {
  */
 export interface InternalTransfer {
   /** The exchange the internal transfer request was made on. */
-  exchange: string;
+  exchange: string
   /** The block this internal transfer request was pocessed in. */
-  blockIdx: number;
+  blockIdx: number
   /** The request index of this internal transfer in the processed requests list (@see getProcessedRequest). */
-  requestIdx: number;
+  requestIdx: number
 
   /** The 'from' account for this internal transfer. */
-  fromAccountID: number;
+  fromAccountID: number
   /** The 'to' account for this internal transfer. */
-  toAccountID: number;
+  toAccountID: number
   /** The token that is being transferred. */
-  tokenID: number;
+  tokenID: number
   /** The amount that was actually withdrawn. */
   amount: string
   /** The token the fee to the operator is paid in. */
-  feeTokenID: number;
+  feeTokenID: number
   /** The fee paid to the operator. */
   fee: string
   /** The type of the transfer. */
-  type: number;
+  type: number
 }
 
 /**
@@ -268,7 +268,7 @@ export interface Storage {
   /** The data field. */
   data: string
   /** The storageID of the data that is currently stored for. */
-  storageID: number;
+  storageID: number
 }
 
 /**
@@ -276,16 +276,16 @@ export interface Storage {
  */
 export interface ProtocolFees {
   /** The exchange with these fees. */
-  exchange: string;
+  exchange: string
 
   /** The fee charged (in bips of amount bought) for taker orders. */
-  takerFeeBips: number;
+  takerFeeBips: number
   /** The fee charged (in bips of amount bought) for maker orders. */
-  makerFeeBips: number;
+  makerFeeBips: number
   /** The previous fee charged (in bips of amount bought) for taker orders. */
-  previousTakerFeeBips: number;
+  previousTakerFeeBips: number
   /** The previous fee charged (in bips of amount bought) for maker orders. */
-  previousMakerFeeBips: number;
+  previousMakerFeeBips: number
 }
 
 /**
@@ -293,37 +293,37 @@ export interface ProtocolFees {
  */
 export interface OnchainAccountLeaf {
   /** The ID of the account. */
-  accountID: number;
+  accountID: number
   /** The owner of the account. */
-  owner: string;
+  owner: string
   /** The public key X of the account. */
-  pubKeyX: string;
+  pubKeyX: string
   /** The public key Y of the account. */
-  pubKeyY: string;
+  pubKeyY: string
   /** The current nonce value of the account. */
-  nonce: number;
+  nonce: number
   /** The fee received for AMM. */
-  feeBipsAMM: number;
+  feeBipsAMM: number
 }
 export interface OnchainBalanceLeaf {
   /** The ID of the token. */
-  tokenID: number;
+  tokenID: number
   /** The current balance the account has for the requested token. */
-  balance: string;
+  balance: string
   /** The weight of the token for AMM. */
-  weightAMM: string;
+  weightAMM: string
   /** The storage root of the balance leaf. */
-  storageRoot: string;
+  storageRoot: string
 }
 export interface WithdrawFromMerkleTreeData {
   /** The account leaf. */
-  accountLeaf: OnchainAccountLeaf;
+  accountLeaf: OnchainAccountLeaf
   /** The balance leaf. */
-  balanceLeaf: OnchainBalanceLeaf;
+  balanceLeaf: OnchainBalanceLeaf
   /** The Merkle proof for the account leaf. */
-  accountMerkleProof: string[];
+  accountMerkleProof: string[]
   /** The Merkle proof for the balance leaf. */
-  balanceMerkleProof: string[];
+  balanceMerkleProof: string[]
 }
 
 /**
@@ -331,26 +331,26 @@ export interface WithdrawFromMerkleTreeData {
  */
 export interface KeyPair {
   /** The public key X. */
-  publicKeyX: string;
+  publicKeyX: string
   /** The public key Y. */
-  publicKeyY: string;
+  publicKeyY: string
   /** The private key. */
-  secretKey: string;
+  secretKey: string
 }
 
 /**
  * The signature data for EdDSA.
  */
 export interface Signature {
-  Rx: string;
-  Ry: string;
-  s: string;
+  Rx: string
+  Ry: string
+  s: string
 }
 
 /// Private
 
 export interface BlockContext {
-  protocolFeeTakerBips: number;
-  protocolFeeMakerBips: number;
-  operatorAccountID: number;
+  protocolFeeTakerBips: number
+  protocolFeeMakerBips: number
+  operatorAccountID: number
 }

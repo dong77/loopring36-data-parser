@@ -1,20 +1,20 @@
-const fs = require("fs");
-import Web3 from "web3";
-import { Constants } from "./constants";
-import { ProtocolV3 } from "./protocol_v3";
-import { ExchangeV3 } from "./exchange_v3";
-import * as log from "./logs";
-const assert = require("assert");
+const fs = require('fs')
+import Web3 from 'web3'
+import { Constants } from './constants'
+import { ProtocolV3 } from './protocol_v3'
+import { ExchangeV3 } from './exchange_v3'
+import * as log from './logs'
+const assert = require('assert')
 
 /**
  * Processes all on-chain data from Loopring in an easy to access way.
  */
 export class Explorer {
-  private web3: Web3;
+  private web3: Web3
 
-  private syncedToEthereumBlockIdx: number;
+  private syncedToEthereumBlockIdx: number
 
-  private exchanges: ExchangeV3[] = [];
+  private exchanges: ExchangeV3[] = []
 
   /**
    * Initializes the Explorer
@@ -22,8 +22,8 @@ export class Explorer {
    * @param   universalRegistryAddress   The address of the universal registry address
    */
   public async initialize(web3: Web3, ethereumBlockFrom: number = 0) {
-    this.web3 = web3;
-    this.syncedToEthereumBlockIdx = ethereumBlockFrom;
+    this.web3 = web3
+    this.syncedToEthereumBlockIdx = ethereumBlockFrom
   }
 
   /**
@@ -32,18 +32,18 @@ export class Explorer {
    */
   public async sync(ethereumBlockTo: number) {
     if (ethereumBlockTo <= this.syncedToEthereumBlockIdx) {
-      return;
+      return
     }
 
-    log.DEBUG("sync from block:", this.syncedToEthereumBlockIdx + 1);
-    log.DEBUG("sync to block:", ethereumBlockTo);
+    log.DEBUG('sync from block:', this.syncedToEthereumBlockIdx + 1)
+    log.DEBUG('sync to block:', ethereumBlockTo)
 
     // Sync the exchange
     for (const exchange of this.exchanges) {
-      await exchange.sync(ethereumBlockTo);
+      await exchange.sync(ethereumBlockTo)
     }
 
-    this.syncedToEthereumBlockIdx = ethereumBlockTo;
+    this.syncedToEthereumBlockIdx = ethereumBlockTo
   }
 
   /**
@@ -53,19 +53,19 @@ export class Explorer {
    */
   public async syncWithStep(ethereumBlockTo: number, exchangeStep: number) {
     if (ethereumBlockTo <= this.syncedToEthereumBlockIdx) {
-      return;
+      return
     }
 
-    log.DEBUG("sync from block:", this.syncedToEthereumBlockIdx + 1);
-    log.DEBUG("sync to block:", ethereumBlockTo);
+    log.DEBUG('sync from block:', this.syncedToEthereumBlockIdx + 1)
+    log.DEBUG('sync to block:', ethereumBlockTo)
 
     // Sync the exchange
     for (const exchange of this.exchanges) {
-      await exchange.sync(this.syncedToEthereumBlockIdx);
-      await exchange.syncWithStep(ethereumBlockTo, exchangeStep);
+      await exchange.sync(this.syncedToEthereumBlockIdx)
+      await exchange.syncWithStep(ethereumBlockTo, exchangeStep)
     }
 
-    this.syncedToEthereumBlockIdx = ethereumBlockTo;
+    this.syncedToEthereumBlockIdx = ethereumBlockTo
   }
 
   /**
@@ -73,7 +73,7 @@ export class Explorer {
    * @return  The total number of exchanges
    */
   public getNumExchanges() {
-    return this.exchanges.length;
+    return this.exchanges.length
   }
 
   /**
@@ -82,8 +82,8 @@ export class Explorer {
    * @return  The exchange on the given index
    */
   public getExchange(idx: number) {
-    assert(idx < this.exchanges.length, "invalid index");
-    return this.exchanges[idx];
+    assert(idx < this.exchanges.length, 'invalid index')
+    return this.exchanges[idx]
   }
 
   /**
@@ -94,10 +94,10 @@ export class Explorer {
   public getExchangeByAddress(exchangeAddress: string) {
     for (const exchange of this.exchanges) {
       if (exchange.getAddress() === exchangeAddress) {
-        return exchange;
+        return exchange
       }
     }
-    return undefined;
+    return undefined
   }
 
   /**
@@ -106,8 +106,8 @@ export class Explorer {
    * @param   owner   The owner of the exchange
    */
   public async addExchange(exchangeAddress: string, owner: string) {
-    const exchange = new ExchangeV3();
-    await exchange.initialize(this.web3, exchangeAddress, owner);
-    this.exchanges.push(exchange);
+    const exchange = new ExchangeV3()
+    await exchange.initialize(this.web3, exchangeAddress, owner)
+    this.exchanges.push(exchange)
   }
 }

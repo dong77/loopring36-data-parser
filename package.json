@@ -16,8 +16,8 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "format": "prettier --write src/**{/,/**/}*.{ts,tsx,css}",
-    "lint": "tsc --noEmit && eslint --fix src/**{/,/**/}*.{ts,tsx,css}"
+    "format": "prettier --write src/**{/,/**/}*.{ts,js}",
+    "lint": "tsc --noEmit && eslint --fix src/**{/,/**/}*.{ts,js}"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [

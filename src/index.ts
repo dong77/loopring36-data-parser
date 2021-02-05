@@ -10,7 +10,6 @@ const startBlock = 11763791
 const exchangeOwner = '0x42bc1ab51b7af89cfaa88a7291ce55971d8cb83a'
 const exchangeV3 = '0x0BABA1Ad5bE3a5C0a66E7ac838a129Bf948f1eA4'
 
-const oprator7 = '0xa921af7e4dd279e1325399e4e3bf13d0e57f48fc'
 const eventBlockSubmitted =
   '0xcc86d9ed29ebae540f9d25a4976d4da36ea4161b854b8ecf18f491cf6b0feb5c'
 
@@ -19,14 +18,9 @@ const BN = web3.utils.BN
 
 const { parseLoopringSubmitBlocksTx } = require('./parse.ts')
 
-const MongoClient = require('mongodb').MongoClient
-const dbUrl = 'mongodb://localhost:27017/'
-const client = new MongoClient(dbUrl)
-const dbname = 'explorer4'
-
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
-const onEvent = async (error, event) => {
+const processNewBlock = async (error, event) => {
   const block = await web3.eth.getBlock(event.blockNumber)
   const tx = await web3.eth.getTransaction(event.transactionHash)
 
@@ -36,6 +30,8 @@ const onEvent = async (error, event) => {
   dexBlock.dexMerkelRoot = dexBlock.data.substring(0, 64 + 2)
   dexBlock.dexPublicDataHash = '0x' + dexBlock.data.substring(66)
   dexBlock.timestamp = block.timestamp
+
+  console.log('processing block ', dexBlock._id, '...')
 
   delete dexBlock.input
   delete dexBlock.hash
@@ -54,11 +50,36 @@ const onEvent = async (error, event) => {
   delete dexBlock.to
   delete dexBlock.from
 
-  const query = { _id: dexBlock._id }
-  const update = { $set: dexBlock }
-  const options = { upsert: true }
+  const transactions = []
+  const accounts = {}
+  const balances = {}
 
-  await client.db(dbname).collection('blocks').updateOne(query, update, options)
+  function addToAccount(accountID, address) {
+    if (accountID !== undefined && address && address !== zeroAddr) {
+      accounts[accountID] = address
+      // console.log(accountID, ' => ', address);
+    }
+  }
+
+  function addBalance(accountID, tokenID, amount) {
+    if (amount != '0') {
+      const balance = balances[accountID] || {}
+      const updates = balance[tokenID] || []
+      updates.push({ amount: amount, add: true })
+      balance[tokenID] = updates
+      balances[accountID] = balance
+    }
+  }
+
+  function removeBalance(accountID, tokenID, amount) {
+    if (amount != '0') {
+      const balance = balances[accountID] || {}
+      const updates = balance[tokenID] || []
+      updates.push({ amount: amount, add: false })
+      balance[tokenID] = updates
+      balances[accountID] = balance
+    }
+  }
 
   const txs = await parseLoopringSubmitBlocksTx(tx)
 
@@ -66,79 +87,58 @@ const onEvent = async (error, event) => {
     tx._id = dexBlock._id * 1000 + idx
     tx.block = dexBlock._id
 
-    const query = { _id: tx._id }
-    const update = { $set: tx }
-    const options = { upsert: true }
-
-    await client
-      .db(dbname)
-      .collection('transactions')
-      .updateOne(query, update, options)
-
-    // ------------- update account bindings -------------
-
-    let newAccount = {
-      address: zeroAddr,
-      _id: undefined,
-    }
+    transactions.push(tx)
 
     if (tx.type === TransactionType[TransactionType.DEPOSIT]) {
-      newAccount = {
-        address: tx.to,
-        _id: tx.toAccountID,
-      }
-      if (newAccount.address === zeroAddr) {
-        console.log(tx)
-      }
-    } else if (tx.type === TransactionType[TransactionType.TRANSFER]) {
-      newAccount = {
-        address: tx.to,
-        _id: tx.accountToID,
-      }
-    } else if (tx.type === TransactionType[TransactionType.ACCOUNT_UPDATE]) {
-      newAccount = {
-        address: tx.owner,
-        _id: tx.accountID,
-      }
-
-      if (newAccount.address === zeroAddr) {
-        console.log(tx)
-      }
+      addToAccount(tx.toAccountID, tx.to)
+      addBalance(tx.toAccountID, tx.tokenID, tx.amount)
     }
+    if (tx.type === TransactionType[TransactionType.WITHDRAWAL]) {
+      removeBalance(tx.fromAccountID, tx.tokenID, tx.amount)
+      removeBalance(tx.fromAccountID, tx.feeTokenID, tx.fee)
 
-    if (
-      newAccount.address !== zeroAddr &&
-      newAccount.address !== null &&
-      newAccount._id !== undefined &&
-      newAccount._id !== null
+      addBalance(0, tx.feeTokenID, tx.fee)
+    } else if (tx.type === TransactionType[TransactionType.TRANSFER]) {
+      addToAccount(tx.accountToID, tx.to)
+
+      removeBalance(tx.accountFromID, tx.tokenID, tx.amount)
+      removeBalance(tx.accountFromID, tx.feeTokenID, tx.fee)
+
+      addBalance(tx.accountToID, tx.tokenID, tx.amount)
+      addBalance(0, tx.feeTokenID, tx.fee)
+    } else if (tx.type === TransactionType[TransactionType.ACCOUNT_UPDATE]) {
+      addToAccount(tx.accountID, tx.owner)
+
+      removeBalance(tx.accountID, tx.feeTokenID, tx.fee)
+      addBalance(0, tx.feeTokenID, tx.fee)
+    } else if (tx.type === TransactionType[TransactionType.SPOT_TRADE]) {
+      removeBalance(tx.accountIdA, tx.tokenA, tx.fillSA)
+      addBalance(tx.accountIdB, tx.tokenA, tx.fillSA)
+
+      removeBalance(tx.accountIdA, tx.tokenA, tx.feeA)
+      addBalance(0, tx.tokenA, tx.feeA)
+
+      removeBalance(tx.accountIdB, tx.tokenB, tx.fillSB)
+      addBalance(tx.accountIdA, tx.tokenB, tx.fillSB)
+
+      removeBalance(tx.accountIdB, tx.tokenB, tx.feeB)
+      addBalance(0, tx.tokenB, tx.feeB)
+    } else if (
+      tx.type === TransactionType[TransactionType.NOOP] ||
+      tx.type === TransactionType[TransactionType.SIGNATURE_VERIFICATION] ||
+      tx.type === TransactionType[TransactionType.AMM_UPDATE]
     ) {
-      await client
-        .db(dbname)
-        .collection('accounts')
-        .updateOne({ _id: newAccount._id }, { $set: newAccount }, options)
+    } else {
+      console.log(tx)
     }
   })
+
+  const data = { dexBlock, accounts, transactions }
+  // console.log(data.accounts)
+  return data
 }
 
 const main = async () => {
-  await client.connect()
-  await client
-    .db(dbname)
-    .createCollection('blocks')
-    .catch((error) => {})
-  await client
-    .db(dbname)
-    .createCollection('transactions')
-    .catch((error) => {})
-  await client
-    .db(dbname)
-    .createCollection('accounts')
-    .catch((error) => {})
-  await client
-    .db(dbname)
-    .createCollection('balances')
-    .catch((error) => {})
-
   const subscription = web3.eth.subscribe(
     'logs',
     {
@@ -146,9 +146,8 @@ const main = async () => {
       address: exchangeV3,
       topics: [eventBlockSubmitted],
     },
-    onEvent
+    processNewBlock
   )
 }
 
 main()
-console.log('end')

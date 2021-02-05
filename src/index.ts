@@ -1,6 +1,6 @@
 const Web3 = require('web3')
 import { TransactionType } from './types'
-const mongo = require('mongodb')
+import writeJsonFile from './filepersister'
 
 const awsGeth =
   'ws://ec2-13-250-42-164.ap-southeast-1.compute.amazonaws.com:8545'
@@ -30,8 +30,6 @@ const processNewBlock = async (error, event) => {
   dexBlock.dexMerkelRoot = dexBlock.data.substring(0, 64 + 2)
   dexBlock.dexPublicDataHash = '0x' + dexBlock.data.substring(66)
   dexBlock.timestamp = block.timestamp
-
-  console.log('processing block ', dexBlock._id, '...')
 
   delete dexBlock.input
   delete dexBlock.hash
@@ -83,7 +81,7 @@ const processNewBlock = async (error, event) => {
 
   const txs = await parseLoopringSubmitBlocksTx(tx)
 
-  txs.forEach(async (tx, idx) => {
+  txs.forEach((tx, idx) => {
     tx._id = dexBlock._id * 1000 + idx
     tx.block = dexBlock._id
 
@@ -92,8 +90,7 @@ const processNewBlock = async (error, event) => {
     if (tx.type === TransactionType[TransactionType.DEPOSIT]) {
       addToAccount(tx.toAccountID, tx.to)
       addBalance(tx.toAccountID, tx.tokenID, tx.amount)
-    }
-    if (tx.type === TransactionType[TransactionType.WITHDRAWAL]) {
+    } else if (tx.type === TransactionType[TransactionType.WITHDRAWAL]) {
       removeBalance(tx.fromAccountID, tx.tokenID, tx.amount)
       removeBalance(tx.fromAccountID, tx.feeTokenID, tx.fee)
 
@@ -133,8 +130,11 @@ const processNewBlock = async (error, event) => {
     }
   })
 
-  const data = { dexBlock, accounts, transactions }
+  console.log('block ', dexBlock._id, 'processed')
+  const data = { block: dexBlock, accounts, balances, transactions }
   // console.log(data.accounts)
+
+  writeJsonFile('./blocks/', dexBlock._id, data)
   return data
 }
 

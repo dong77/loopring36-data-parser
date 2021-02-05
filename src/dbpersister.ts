@@ -139,6 +139,7 @@ const main = async () => {
     .createCollection('balances')
     .catch((error) => {})
 
+  // getPastLogs
   const subscription = web3.eth.subscribe(
     'logs',
     {

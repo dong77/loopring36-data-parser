@@ -62,9 +62,19 @@ const processNewBlock = async (error, event) => {
   function addBalance(accountID, tokenID, amount) {
     if (amount != '0') {
       const balance = balances[accountID] || {}
-      const updates = balance[tokenID] || []
-      updates.push({ amount: amount, add: true })
-      balance[tokenID] = updates
+      const update = balance[tokenID] || { diff: new BN(0), add: true }
+      const amountBN = new BN(amount)
+
+      if (update.add === true) {
+        update.diff = update.diff.add(amountBN)
+      } else if (update.diff > amountBN) {
+        update.diff = update.diff.sub(amountBN)
+      } else {
+        update.diff = amountBN.sub(update.diff)
+        update.add = !update.add
+      }
+
+      balance[tokenID] = update
       balances[accountID] = balance
     }
   }
@@ -72,9 +82,19 @@ const processNewBlock = async (error, event) => {
   function removeBalance(accountID, tokenID, amount) {
     if (amount != '0') {
       const balance = balances[accountID] || {}
-      const updates = balance[tokenID] || []
-      updates.push({ amount: amount, add: false })
-      balance[tokenID] = updates
+      const update = balance[tokenID] || { diff: new BN(0), add: true }
+      const amountBN = new BN(amount)
+
+      if (update.add === false) {
+        update.diff = update.diff.add(amountBN)
+      } else if (update.diff > amountBN) {
+        update.diff = update.diff.sub(amountBN)
+      } else {
+        update.diff = amountBN.sub(update.diff)
+        update.add = !update.add
+      }
+
+      balance[tokenID] = update
       balances[accountID] = balance
     }
   }
@@ -130,8 +150,18 @@ const processNewBlock = async (error, event) => {
     }
   })
 
+  const balances_ = []
+
+  Object.keys(balances).map((accountID) => {
+    const balance = balances[accountID]
+    Object.keys(balance).map((tokenID) => {
+      const diff = balance[tokenID].diff.toString()
+      const add = balance[tokenID].add
+      balances_.push({ accountID, tokenID, diff, add })
+    })
+  })
   console.log('block ', dexBlock._id, 'processed')
-  const data = { block: dexBlock, accounts, balances, transactions }
+  const data = { block: dexBlock, accounts, balances: balances_, transactions }
   // console.log(data.accounts)
 
   writeJsonFile('./blocks/', dexBlock._id, data)

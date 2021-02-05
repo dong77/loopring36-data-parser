@@ -67,7 +67,7 @@ const processNewBlock = async (error, event) => {
 
       if (update.add === true) {
         update.diff = update.diff.add(amountBN)
-      } else if (update.diff > amountBN) {
+      } else if (update.diff.gt(amountBN)) {
         update.diff = update.diff.sub(amountBN)
       } else {
         update.diff = amountBN.sub(update.diff)
@@ -87,7 +87,7 @@ const processNewBlock = async (error, event) => {
 
       if (update.add === false) {
         update.diff = update.diff.add(amountBN)
-      } else if (update.diff > amountBN) {
+      } else if (update.diff.gt(amountBN)) {
         update.diff = update.diff.sub(amountBN)
       } else {
         update.diff = amountBN.sub(update.diff)
@@ -150,6 +150,15 @@ const processNewBlock = async (error, event) => {
     }
   })
 
+  const accounts_ = []
+
+  Object.keys(accounts).map((accountID) => {
+    accounts_.push({
+      accountID: parseInt(accountID),
+      address: accounts[accountID],
+    })
+  })
+
   const balances_ = []
 
   Object.keys(balances).map((accountID) => {
@@ -157,11 +166,21 @@ const processNewBlock = async (error, event) => {
     Object.keys(balance).map((tokenID) => {
       const diff = balance[tokenID].diff.toString()
       const add = balance[tokenID].add
-      balances_.push({ accountID, tokenID, diff, add })
+      balances_.push({
+        accountID: parseInt(accountID),
+        tokenID: parseInt(tokenID),
+        diff,
+        add,
+      })
     })
   })
   console.log('block ', dexBlock._id, 'processed')
-  const data = { block: dexBlock, accounts, balances: balances_, transactions }
+  const data = {
+    block: dexBlock,
+    accounts: accounts_,
+    balances: balances_,
+    transactions,
+  }
   // console.log(data.accounts)
 
   writeJsonFile('./blocks/', dexBlock._id, data)

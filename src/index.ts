@@ -28,7 +28,7 @@ const main = async () => {
 
   const status = await persister.loadStatus(deployBlockNumber)
   console.log(status)
-  status.nextEthBlock = 11711600
+  status.nextEthBlock = 11620509 - 91223 * 1 // OVERRIDE
 
   const mutex = new Mutex()
 

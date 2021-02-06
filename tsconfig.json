@@ -3,6 +3,7 @@
     "target": "es6",
     "downlevelIteration": true,
     "rootDir": "src",
+    "resolveJsonModule":true,
     "lib": [
       "dom",
       "es6",

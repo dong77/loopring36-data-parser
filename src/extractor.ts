@@ -1,6 +1,7 @@
 import { TransactionType } from './types'
 import { Bitstream } from './bitstream'
 import { parseLoopringSubmitBlocksTx } from './parse'
+import * as ERC20ABI from './abi/ERC20.abi.json'
 
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
@@ -170,11 +171,24 @@ const extractBlock = async (web3, event) => {
 }
 
 const extractToken = async (web3, event) => {
-  console.log(event)
-  console.log(event.data.length)
+  const block = await web3.eth.getBlock(event.blockNumber)
+
   const bs = new Bitstream(event.data)
   const address = bs.extractAddress(12)
   const _id = parseInt(bs.extractUint(32).toString())
-  return { _id, address }
+
+  const contract = new web3.eth.Contract(ERC20ABI, address)
+  const name = await contract.methods.name().call()
+  const symbol = await contract.methods.symbol().call()
+  const decimals = parseInt(await contract.methods.decimals().call())
+  return {
+    _id,
+    address,
+    name,
+    symbol,
+    decimals,
+    block: event.blockNumber,
+    timestamp: block.timestamp,
+  }
 }
 export { zeroAddr, extractBlock, extractToken }

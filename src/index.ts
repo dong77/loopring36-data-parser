@@ -7,7 +7,7 @@ import { zeroAddr, extractBlock, extractToken } from './extractor'
 
 const geth = 'wss://mainnet.infura.io/ws/v3/3cdee1310ccc4e9fbb19bf8d9967358e'
 
-const exchangeOwner = '0x42bc1ab51b7af89cfaa88a7291ce55971d8cb83a'
+// const exchangeOwner = '0x42bc1ab51b7af89cfaa88a7291ce55971d8cb83a'
 const exchangeV3 = '0x0BABA1Ad5bE3a5C0a66E7ac838a129Bf948f1eA4'
 
 const eventTokenRegistered =
@@ -23,11 +23,12 @@ let web3 = new Web3(Web3.givenProvider || geth, {
 })
 
 const main = async () => {
+  const deployBlockNumber = 11149814
   const persister = await getPersister('mongodb://localhost:27017/', 'A5')
 
-  const status = await persister.loadStatus(11711600)
+  const status = await persister.loadStatus(deployBlockNumber)
   console.log(status)
-  status.nextEthBlock = 11711600
+  // status.nextEthBlock = 11711600
 
   const mutex = new Mutex()
 
@@ -76,7 +77,7 @@ const main = async () => {
         }
       }
 
-      status.nextEthBlock = event.blockNumber
+      status.nextEthBlock = event.blockNumber + 1
       await persister.saveStatus(status)
     })
   }

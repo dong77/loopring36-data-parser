@@ -48,7 +48,14 @@ const main = async () => {
           data
         )
         await persister.persistBlock(data)
-        console.log('block', data.block._id, 'processed')
+        console.log(
+          'block:',
+          data.block._id,
+          'operator:',
+          data.block.from,
+          'height',
+          data.block.blockNumber
+        )
       } else {
         const token = await extractToken(web3, event)
         if (token) {
@@ -58,7 +65,14 @@ const main = async () => {
             token
           )
           await persister.persistToken(token)
-          console.log('token registered:', token.address, '/', token._id)
+          console.log(
+            'token:',
+            token.address,
+            'id:',
+            token._id,
+            'height:',
+            token.blockNumber
+          )
         }
       }
 

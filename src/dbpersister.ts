@@ -18,6 +18,7 @@ async function getPersister(dbUrl, dbName) {
   await db.collection('tokens').createIndex({ address: 1 })
 
   await db.createCollection('blocks').catch((err) => {})
+  await db.collection('blocks').createIndex({ operator: 1, _id: -1 })
 
   await db.createCollection('transactions').catch((err) => {})
   await db.collection('transactions').createIndex({ block: -1 })

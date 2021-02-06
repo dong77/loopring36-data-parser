@@ -34,7 +34,6 @@ const extractBlock = async (web3, event) => {
   delete dexBlock.transactionIndex
   delete dexBlock.address
   delete dexBlock.to
-  delete dexBlock.from
 
   const transactions = []
   const accounts = {}

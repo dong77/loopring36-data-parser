@@ -15,20 +15,21 @@ const eventTokenRegistered =
 const eventBlockSubmitted =
   '0xcc86d9ed29ebae540f9d25a4976d4da36ea4161b854b8ecf18f491cf6b0feb5c'
 
-let web3 = new Web3(Web3.givenProvider || geth, {
-  clientOptions: {
-    maxReceivedFrameSize: 100000000,
-    maxReceivedMessageSize: 100000000,
-  },
-})
-
+let web3 = new Web3(
+  new Web3.providers.WebsocketProvider(geth, {
+    clientConfig: {
+      maxReceivedFrameSize: 10000000000,
+      maxReceivedMessageSize: 10000000000,
+    },
+  })
+)
 const main = async () => {
   const deployBlockNumber = 11149814
   const persister = await getPersister('mongodb://localhost:27017/', 'A7')
 
   const status = await persister.loadStatus(deployBlockNumber)
   console.log(status)
-  status.nextEthBlock = 11620509 - 91223 * 1 // OVERRIDE
+  status.nextEthBlock = 11620509 - (91222 / 2) * 3 // OVERRIDE
 
   const mutex = new Mutex()
 
@@ -77,7 +78,10 @@ const main = async () => {
   }
 
   // order is important, we want to process token registration first.
-  const events = [eventTokenRegistered, eventBlockSubmitted]
+  const events = [
+    // eventTokenRegistered,
+    eventBlockSubmitted,
+  ]
 
   events.forEach((evt) => {
     const subscription1 = web3.eth.subscribe(

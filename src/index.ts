@@ -25,11 +25,11 @@ let web3 = new Web3(
 )
 const main = async () => {
   const deployBlockNumber = 11149814
-  const persister = await getPersister('mongodb://localhost:27017/', 'A7')
+  const persister = await getPersister('mongodb://localhost:27017/', 'A8')
 
   const status = await persister.loadStatus(deployBlockNumber)
   console.log(status)
-  status.nextEthBlock = 11620509 - (91222 / 2) * 3 // OVERRIDE
+  // status.nextEthBlock = 11620509 - (91222 / 2) * 3 // OVERRIDE
 
   const mutex = new Mutex()
 

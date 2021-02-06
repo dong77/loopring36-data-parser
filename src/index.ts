@@ -76,7 +76,8 @@ const main = async () => {
     })
   }
 
-  const events = [eventBlockSubmitted, eventTokenRegistered]
+  // order is important, we want to process token registration first.
+  const events = [eventTokenRegistered, eventBlockSubmitted]
 
   events.forEach((evt) => {
     const subscription1 = web3.eth.subscribe(

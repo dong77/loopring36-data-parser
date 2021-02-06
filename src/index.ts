@@ -25,7 +25,7 @@ const main = async () => {
 
   const status = await persister.loadStatus(11799600)
   console.log(status)
-  status.nextEthBlock = 11789055
+  status.nextEthBlock = 1
 
   const mutex = new Mutex()
   const subscription = web3.eth.subscribe(

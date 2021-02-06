@@ -177,6 +177,18 @@ const extractToken = async (web3, event) => {
   const address = bs.extractAddress(12)
   const _id = parseInt(bs.extractUint(32).toString())
 
+  if (address === zeroAddr) {
+    return {
+      _id,
+      address,
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      block: event.blockNumber,
+      timestamp: block.timestamp,
+    }
+  }
+
   const contract = new web3.eth.Contract(ERC20ABI, address)
   const name = await contract.methods.name().call()
   const symbol = await contract.methods.symbol().call()

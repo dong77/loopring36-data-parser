@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-function writeJsonFile(directory, blockIdx, data) {
+async function writeJsonFile(directory, blockIdx, data) {
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory)
   }

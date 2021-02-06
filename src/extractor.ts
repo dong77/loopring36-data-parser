@@ -87,7 +87,7 @@ const extractBlock = async (web3, event) => {
   const txs = await parseLoopringSubmitBlocksTx(tx)
 
   txs.forEach((tx, idx) => {
-    tx._id = dexBlock._id * 1000 + idx
+    tx._id = dexBlock._id * 10000 + idx
     tx.block = dexBlock._id
 
     transactions.push(tx)
@@ -152,7 +152,7 @@ const extractBlock = async (web3, event) => {
       const diff = balance[tokenID].diff.toString()
       const add = balance[tokenID].add
       balances_.push({
-        accountID: parseInt(accountID),
+        _id: parseInt(accountID),
         tokenID: parseInt(tokenID),
         diff,
         add,

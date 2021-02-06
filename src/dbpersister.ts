@@ -13,11 +13,26 @@ async function getPersister(dbUrl, dbName) {
 
   const db = client.db(name)
   await db.createCollection('status').catch((err) => {})
+
   await db.createCollection('tokens').catch((err) => {})
+  await db.collection('tokens').createIndex({ address: 1 })
+
   await db.createCollection('blocks').catch((err) => {})
+
   await db.createCollection('transactions').catch((err) => {})
+  await db.collection('transactions').createIndex({ block: -1 })
+  await db.collection('transactions').createIndex({ type: 1, _id: -1 })
+  await db.collection('transactions').createIndex({ tokenA: 1, _id: -1 })
+  await db.collection('transactions').createIndex({ tokenB: 1, _id: -1 })
+  await db.collection('transactions').createIndex({ accountIdA: 1, _id: -1 })
+  await db.collection('transactions').createIndex({ accountIdB: 1, _id: -1 })
+
   await db.createCollection('accounts').catch((err) => {})
+  await db.collection('accounts').createIndex({ address: 1 })
+
   await db.createCollection('balances').catch((err) => {})
+  await db.collection('balances').createIndex({ _id: -1, tokenID: 1 })
+  await db.collection('balances').createIndex({ tokenID: 1, _id: -1 })
 
   const loadStatus = async (defaultNextEthBlock) => {
     const status = await db.collection('status').findOne({ _id: 1 })

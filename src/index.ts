@@ -23,29 +23,43 @@ const main = async () => {
   const status = await persister.loadStatus(11799600)
   console.log(status)
 
-  const step = 100
+  const step = 1000
 
-  let i = 0
-  while (i === 0) {
-    web3.eth
-      .getPastLogs({
-        fromBlock: status.nextEthBlock,
-        toBlock: status.nextEthBlock + step,
-        address: exchangeV3,
-        topics: [eventBlockSubmitted],
-      })
-      .then(async (events) => {
-        i++
-        console.log(events.length(), '---------')
-        events.forEach(async (event) => {
-          const data = await extractBlock(web3, event)
-          await writeJsonFile('./blocks/', data.block._id, data)
-        })
+  status.nextEthBlock = 11800923 - step
 
-        status.nextEthBlock += step
-        await persister.saveStatus(status)
-      })
+  // let i = 0
+  // while (i === 0) {
+
+  const processEvents = async (events, func) => {
+    console.log('remaining', events.length)
+    if (events.length == 0) return
+    else {
+      await func(events[0])
+      await processEvents(events.slice(1), func)
+    }
   }
+
+  web3.eth
+    .getPastLogs({
+      fromBlock: status.nextEthBlock,
+      toBlock: status.nextEthBlock + step,
+      address: exchangeV3,
+      topics: [eventBlockSubmitted],
+    })
+    .then(async (events) => {
+      await processEvents(events, async (event) => {
+        const data = await extractBlock(web3, event)
+        await writeJsonFile('./blocks/', data.block._id, data)
+        await persister.persist(data)
+      })
+
+      status.nextEthBlock += step
+      console.log('on ethereum block', status.nextEthBlock)
+      await persister.saveStatus(status)
+    })
+
+  console.log('done')
+  // }
 
   // status.nextEthBlock += 1
   // await persister.saveStatus(status)

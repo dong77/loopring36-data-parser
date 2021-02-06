@@ -18,11 +18,11 @@ async function getPersister(dbUrl, dbName) {
   await db.createCollection('accounts').catch((err) => {})
   await db.createCollection('balances').catch((err) => {})
 
-  const loadStatus = async (defaultFirstEthBlock) => {
+  const loadStatus = async (defaultNextEthBlock) => {
     const status = await db.collection('status').findOne({ _id: 1 })
     return (
       status || {
-        firstEthBlock: defaultFirstEthBlock,
+        nextEthBlock: defaultNextEthBlock,
         lastAccountID: -1,
       }
     )

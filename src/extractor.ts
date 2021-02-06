@@ -169,4 +169,7 @@ const extractBlock = async (web3, event) => {
   return data
 }
 
-export { zeroAddr, extractBlock }
+const extractToken = async (web3, event) => {
+  return { _id: 123, address: 'abc' }
+}
+export { zeroAddr, extractBlock, extractToken }

@@ -13,6 +13,7 @@ async function getPersister(dbUrl, dbName) {
 
   const db = client.db(name)
   await db.createCollection('status').catch((err) => {})
+  await db.createCollection('tokens').catch((err) => {})
   await db.createCollection('blocks').catch((err) => {})
   await db.createCollection('transactions').catch((err) => {})
   await db.createCollection('accounts').catch((err) => {})
@@ -33,11 +34,17 @@ async function getPersister(dbUrl, dbName) {
       .updateOne({ _id: 1 }, { $set: status }, { upsert: true })
   }
 
-  const persist = async (data) => {
+  const persistBlock = async (data) => {
     console.log('persisting block', data.block._id, '...')
   }
 
-  return { client, loadStatus, saveStatus, persist }
+  const persistToken = async (token) => {
+    await db
+      .collection('tokens')
+      .updateOne({ _id: token._id }, { $set: token }, { upsert: true })
+  }
+
+  return { client, loadStatus, saveStatus, persistBlock, persistToken }
 }
 
 export default getPersister

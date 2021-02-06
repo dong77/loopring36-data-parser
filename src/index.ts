@@ -22,11 +22,33 @@ const main = async () => {
 
   const status = await persister.loadStatus(11799600)
   console.log(status)
-  status.firstEthBlock += 1
-  await persister.saveStatus(status)
 
-  const status2 = await persister.loadStatus(11799600)
-  console.log(status2)
+  const step = 100
+
+  let i = 0
+  while (i === 0) {
+    web3.eth
+      .getPastLogs({
+        fromBlock: status.nextEthBlock,
+        toBlock: status.nextEthBlock + step,
+        address: exchangeV3,
+        topics: [eventBlockSubmitted],
+      })
+      .then(async (events) => {
+        i++
+        console.log(events.length(), '---------')
+        events.forEach(async (event) => {
+          const data = await extractBlock(web3, event)
+          await writeJsonFile('./blocks/', data.block._id, data)
+        })
+
+        status.nextEthBlock += step
+        await persister.saveStatus(status)
+      })
+  }
+
+  // status.nextEthBlock += 1
+  // await persister.saveStatus(status)
 
   // const subscription = web3.eth.subscribe(
   //   'logs',

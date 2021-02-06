@@ -20,9 +20,6 @@ async function getPersister(dbUrl, dbName) {
 
   const loadStatus = async (defaultFirstEthBlock) => {
     const status = await db.collection('status').findOne({ _id: 1 })
-
-    console.log('status:', status)
-
     return (
       status || {
         firstEthBlock: defaultFirstEthBlock,

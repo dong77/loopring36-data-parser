@@ -198,51 +198,66 @@ const extractBlock = async (web3, event) => {
 }
 
 const extractToken = async (web3, event) => {
-  const block = await web3.eth.getBlock(event.blockNumber)
-
   const bs = new Bitstream(event.data)
   const address = bs.extractAddress(12)
   const _id = parseInt(bs.extractUint(32).toString())
 
-  if (_id === 24) {
-    //disabled
-    return null
-  }
-  if (_id === 7) {
-    return {
-      _id,
-      address,
-      name: 'Maker',
-      symbol: 'MKR',
-      decimals: 18,
-      blockNumber: event.blockNumber,
-      timestamp: block.timestamp,
+  let token
+  try {
+    token = JSON.parse(
+      fs.readFileSync('./data/rawtokens/token_' + _id + '.json')
+    )
+    token.cached = true
+  } catch (err) {
+    if (_id === 24) {
+      //disabled
+      token = null
+    } else {
+      const block = await web3.eth.getBlock(event.blockNumber)
+      if (_id === 7) {
+        token = {
+          _id,
+          address,
+          name: 'Maker',
+          symbol: 'MKR',
+          decimals: 18,
+          blockNumber: event.blockNumber,
+          timestamp: block.timestamp,
+        }
+      } else if (address === zeroAddr) {
+        token = {
+          _id,
+          address,
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18,
+          blockNumber: event.blockNumber,
+          timestamp: block.timestamp,
+        }
+      } else {
+        const contract = new web3.eth.Contract(ERC20ABI, address)
+        const name = await contract.methods.name().call()
+        const symbol = await contract.methods.symbol().call()
+        const decimals = parseInt(await contract.methods.decimals().call())
+        token = {
+          _id,
+          address,
+          name,
+          symbol,
+          decimals,
+          blockNumber: event.blockNumber,
+          timestamp: block.timestamp,
+        }
+      }
     }
-  }
-  if (address === zeroAddr) {
-    return {
-      _id,
-      address,
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      blockNumber: event.blockNumber,
-      timestamp: block.timestamp,
+
+    if (!fs.existsSync('./data/rawtokens/')) {
+      fs.mkdirSync('./data/rawtokens/')
     }
+
+    await writeJsonFile('./data/rawtokens/', 'token_' + _id, token)
   }
 
-  const contract = new web3.eth.Contract(ERC20ABI, address)
-  const name = await contract.methods.name().call()
-  const symbol = await contract.methods.symbol().call()
-  const decimals = parseInt(await contract.methods.decimals().call())
-  return {
-    _id,
-    address,
-    name,
-    symbol,
-    decimals,
-    blockNumber: event.blockNumber,
-    timestamp: block.timestamp,
-  }
+  return token
 }
 export { zeroAddr, extractBlock, extractToken }

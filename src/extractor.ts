@@ -177,6 +177,10 @@ const extractToken = async (web3, event) => {
   const address = bs.extractAddress(12)
   const _id = parseInt(bs.extractUint(32).toString())
 
+  // 7, 24
+  if (_id === 7 || _id === 24) {
+    console.log(event.data)
+  }
   if (address === zeroAddr) {
     return {
       _id,
@@ -184,7 +188,7 @@ const extractToken = async (web3, event) => {
       name: 'Ether',
       symbol: 'ETH',
       decimals: 18,
-      block: event.blockNumber,
+      blockNumber: event.blockNumber,
       timestamp: block.timestamp,
     }
   }
@@ -199,7 +203,7 @@ const extractToken = async (web3, event) => {
     name,
     symbol,
     decimals,
-    block: event.blockNumber,
+    blockNumber: event.blockNumber,
     timestamp: block.timestamp,
   }
 }

@@ -1,5 +1,5 @@
 import { TransactionType } from './types'
-
+import { Bitstream } from './bitstream'
 import { parseLoopringSubmitBlocksTx } from './parse'
 
 const zeroAddr = '0x0000000000000000000000000000000000000000'
@@ -170,6 +170,11 @@ const extractBlock = async (web3, event) => {
 }
 
 const extractToken = async (web3, event) => {
-  return { _id: 123, address: 'abc' }
+  console.log(event)
+  console.log(event.data.length)
+  const bs = new Bitstream(event.data)
+  const address = bs.extractAddress(12)
+  const _id = parseInt(bs.extractUint(32).toString())
+  return { _id, address }
 }
 export { zeroAddr, extractBlock, extractToken }

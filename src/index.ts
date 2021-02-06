@@ -46,7 +46,8 @@ const main = async () => {
           await persister.persistBlock(data)
         } else {
           // console.log(event)
-          const token = extractToken(web3, event)
+          const token = await extractToken(web3, event)
+          console.log(token)
           await persister.persistToken(token)
         }
 

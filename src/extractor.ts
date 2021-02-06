@@ -16,8 +16,10 @@ const extractBlock = async (web3, event) => {
   let dexBlock
   let tx
   try {
-    const rawBlock = JSON.parse(fs.readFile('./rawblocks/', 'block_' + _id))
-    dexBlock = { event: rawBlock.event, tx: rawBlock.tx, _id }
+    const rawBlock = JSON.parse(
+      fs.readFileSync('./rawblocks/block_' + _id + '.json')
+    )
+    dexBlock = { ...rawBlock.event, ...rawBlock.tx, _id }
     tx = rawBlock.tx
     cached = true
   } catch (err) {
@@ -30,7 +32,7 @@ const extractBlock = async (web3, event) => {
       fs.mkdirSync('./rawblocks/')
     }
 
-    await writeJsonFile('./rawblocks/', 'block' + _id, { event, tx, _id })
+    await writeJsonFile('./rawblocks/', 'block_' + _id, { event, tx, _id })
   }
 
   delete dexBlock.input

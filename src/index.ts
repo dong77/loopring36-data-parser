@@ -24,11 +24,11 @@ let web3 = new Web3(Web3.givenProvider || geth, {
 
 const main = async () => {
   const deployBlockNumber = 11149814
-  const persister = await getPersister('mongodb://localhost:27017/', 'A5')
+  const persister = await getPersister('mongodb://localhost:27017/', 'A7')
 
   const status = await persister.loadStatus(deployBlockNumber)
   console.log(status)
-  // status.nextEthBlock = 11711600
+  status.nextEthBlock = 11711600
 
   const mutex = new Mutex()
 

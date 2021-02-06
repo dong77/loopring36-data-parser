@@ -53,7 +53,7 @@ const main = async () => {
           data.block._id,
           'operator:',
           data.block.from,
-          'height',
+          'height:',
           data.block.blockNumber
         )
       } else {

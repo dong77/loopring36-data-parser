@@ -96,11 +96,15 @@ const extractBlock = async (web3, event) => {
     if (tx.type === TransactionType[TransactionType.DEPOSIT]) {
       addToAccount(tx.toAccountID, tx.to)
       addBalance(tx.toAccountID, tx.tokenID, tx.amount)
+      delete tx.to
     } else if (tx.type === TransactionType[TransactionType.WITHDRAWAL]) {
       removeBalance(tx.fromAccountID, tx.tokenID, tx.amount)
       removeBalance(tx.fromAccountID, tx.feeTokenID, tx.fee)
 
       addBalance(0, tx.feeTokenID, tx.fee)
+
+      delete tx.from
+      // TODO tx.to address not found.
     } else if (tx.type === TransactionType[TransactionType.TRANSFER]) {
       addToAccount(tx.accountToID, tx.to)
 
@@ -109,11 +113,16 @@ const extractBlock = async (web3, event) => {
 
       addBalance(tx.accountToID, tx.tokenID, tx.amount)
       addBalance(0, tx.feeTokenID, tx.fee)
+
+      delete tx.from
+      delete tx.to
     } else if (tx.type === TransactionType[TransactionType.ACCOUNT_UPDATE]) {
       addToAccount(tx.accountID, tx.owner)
 
       removeBalance(tx.accountID, tx.feeTokenID, tx.fee)
       addBalance(0, tx.feeTokenID, tx.fee)
+
+      delete tx.owner
     } else if (tx.type === TransactionType[TransactionType.SPOT_TRADE]) {
       removeBalance(tx.accountIdA, tx.tokenA, tx.fillSA)
       addBalance(tx.accountIdB, tx.tokenA, tx.fillSA)

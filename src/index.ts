@@ -44,13 +44,14 @@ const main = async () => {
           const data = await extractBlock(web3, event)
           await writeJsonFile('./blocks/', data.block._id, data)
           await persister.persistBlock(data)
-
-          status.nextEthBlock = data.block.blockNumber
-          await persister.saveStatus(status)
         } else {
+          // console.log(event)
           const token = extractToken(web3, event)
           await persister.persistToken(token)
         }
+
+        status.nextEthBlock = event.blockNumber
+        await persister.saveStatus(status)
       })
     }
   )

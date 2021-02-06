@@ -49,15 +49,13 @@ async function getPersister(dbUrl, dbName) {
       .updateOne({ _id: 1 }, { $set: status }, { upsert: true })
   }
 
-  const persistBlock = async (data) => {
-    console.log('persisting block', data.block._id, '...')
-  }
-
   const persistToken = async (token) => {
     await db
       .collection('tokens')
       .updateOne({ _id: token._id }, { $set: token }, { upsert: true })
   }
+
+  const persistBlock = async (data) => {}
 
   return { client, loadStatus, saveStatus, persistBlock, persistToken }
 }

@@ -15,17 +15,19 @@ const eventTokenRegistered =
 const eventBlockSubmitted =
   '0xcc86d9ed29ebae540f9d25a4976d4da36ea4161b854b8ecf18f491cf6b0feb5c'
 
-let web3 = new Web3(Web3.givenProvider || geth)
+let web3 = new Web3(Web3.givenProvider || geth, {
+  clientOptions: {
+    maxReceivedFrameSize: 100000000,
+    maxReceivedMessageSize: 100000000,
+  },
+})
 
 const main = async () => {
-  const persister = await getPersister(
-    'mongodb://localhost:27017/',
-    'explorer4'
-  )
+  const persister = await getPersister('mongodb://localhost:27017/', 'A3')
 
   const status = await persister.loadStatus(11799600)
   console.log(status)
-  status.nextEthBlock = 1
+  // status.nextEthBlock =
 
   const mutex = new Mutex()
   const subscription = web3.eth.subscribe(
@@ -34,22 +36,37 @@ const main = async () => {
       fromBlock: status.nextEthBlock,
       address: exchangeV3,
       topics: [
-        // eventBlockSubmitted,
-        eventTokenRegistered,
+        eventBlockSubmitted,
+        // eventTokenRegistered,
       ],
     },
-    async (error, event) => {
+    async (err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       await mutex.runExclusive(async () => {
+        console.log('------------', event)
+
         if (event.topics[0] === eventBlockSubmitted) {
           const data = await extractBlock(web3, event)
-          await writeJsonFile('./blocks/', data.block._id, data)
+          await writeJsonFile(
+            './blocks/',
+            data.block.blockNumber + '-' + data.block._id,
+            data
+          )
           await persister.persistBlock(data)
+          console.log('block', data.block._id, 'processed')
         } else {
-          // console.log(event)
           const token = await extractToken(web3, event)
-          console.log(token)
           if (token) {
+            await writeJsonFile(
+              './tokens/',
+              token.blockNumber + '-' + token._id,
+              token
+            )
             await persister.persistToken(token)
+            console.log('token registered:', token.address, '/', token._id)
           }
         }
 

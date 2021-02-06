@@ -12,7 +12,9 @@ const extractBlock = async (web3, event) => {
 
   const dexBlock = { ...event, ...tx }
 
-  dexBlock._id = parseInt(new BN(dexBlock.topics[1].substring(2)).toString())
+  dexBlock._id = parseInt(
+    new BN(dexBlock.topics[1].substring(2), 16).toString()
+  )
   dexBlock.dexMerkelRoot = dexBlock.data.substring(0, 64 + 2)
   dexBlock.dexPublicDataHash = '0x' + dexBlock.data.substring(66)
   dexBlock.timestamp = block.timestamp
@@ -159,7 +161,7 @@ const extractBlock = async (web3, event) => {
       })
     })
   })
-  console.log('block ', dexBlock._id, 'processed')
+
   const data = {
     block: dexBlock,
     accounts: accounts_,

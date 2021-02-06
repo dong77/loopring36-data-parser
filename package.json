@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "async-mutex": "^0.3.0",
     "axios": "^0.21.0",
     "blake-hash": "^2.0.0",
     "blake2b": "^2.1.3",

@@ -22,7 +22,8 @@ const main = async () => {
 
   const status = await persister.loadStatus(11799600)
   console.log(status)
-  await persister.saveStatus(status.firstEthBlock, status.lastAccountID)
+  status.firstEthBlock += 1
+  await persister.saveStatus(status)
 
   const status2 = await persister.loadStatus(11799600)
   console.log(status2)

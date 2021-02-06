@@ -17,6 +17,7 @@ async function getPersister(dbUrl, dbName) {
   await db.createCollection('transactions').catch((err) => {})
   await db.createCollection('accounts').catch((err) => {})
   await db.createCollection('balances').catch((err) => {})
+
   const loadStatus = async (defaultFirstEthBlock) => {
     const status = await db.collection('status').findOne({ _id: 1 })
 
@@ -30,15 +31,10 @@ async function getPersister(dbUrl, dbName) {
     )
   }
 
-  const saveStatus = async (firstEthBlock, lastAccountID) => {
-    await db.collection('status').updateOne(
-      { _id: 1 },
-      {
-        firstEthBlock: firstEthBlock,
-        lastAccountID: lastAccountID,
-      },
-      { upsert: true }
-    )
+  const saveStatus = async (status) => {
+    await db
+      .collection('status')
+      .updateOne({ _id: 1 }, { $set: status }, { upsert: true })
   }
 
   const persist = async (data) => {

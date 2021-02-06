@@ -1,0 +1,9 @@
+{
+    "_id": 2,
+    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "name": "Wrapped Ether",
+    "symbol": "WETH",
+    "decimals": 18,
+    "blockNumber": 11318327,
+    "timestamp": 1606185810
+}

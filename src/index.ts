@@ -29,7 +29,7 @@ const main = async () => {
 
   const status = await persister.loadStatus(deployBlockNumber)
   console.log(status)
-  // status.nextEthBlock = 11149814
+  status.nextEthBlock = deployBlockNumber
 
   const mutex = new Mutex()
 
@@ -58,8 +58,10 @@ const main = async () => {
         )
       } else {
         const token = await extractToken(web3, event)
-        if (token) {
+        if (token !== {}) {
           await writeJsonFile('./data/tokens/', 'token_' + token._id, token)
+          const cached = token.cached || false
+          delete token.cached
           await persister.persistToken(token)
           console.log(
             'token:',
@@ -67,7 +69,9 @@ const main = async () => {
             'id:',
             token._id,
             'height:',
-            token.blockNumber
+            token.blockNumber,
+            'cached:',
+            cached
           )
         }
       }

@@ -1,0 +1,9 @@
+{
+    "_id": 5,
+    "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "name": "Dai Stablecoin",
+    "symbol": "DAI",
+    "decimals": 18,
+    "blockNumber": 11318345,
+    "timestamp": 1606185954
+}

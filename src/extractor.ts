@@ -211,7 +211,7 @@ const extractToken = async (web3, event) => {
   } catch (err) {
     if (_id === 24) {
       //disabled
-      token = null
+      token = {}
     } else {
       const block = await web3.eth.getBlock(event.blockNumber)
       if (_id === 7) {

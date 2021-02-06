@@ -1,6 +1,7 @@
 const Web3 = require('web3')
 import { TransactionType } from './types'
 import writeJsonFile from './filepersister'
+import getPersister from './dbpersister'
 import { zeroAddr, extractBlock } from './extractor'
 
 const geth = 'wss://mainnet.infura.io/ws/v3/3cdee1310ccc4e9fbb19bf8d9967358e'
@@ -15,6 +16,7 @@ const eventBlockSubmitted =
 let web3 = new Web3(Web3.givenProvider || geth)
 
 const main = async () => {
+  const perister = await getPersister('mongodb://localhost:27017/', 'explorer4')
   const subscription = web3.eth.subscribe(
     'logs',
     {
@@ -25,6 +27,7 @@ const main = async () => {
     async (error, event) => {
       const data = await extractBlock(web3, event)
       await writeJsonFile('./blocks/', data.block._id, data)
+      await perister.persist(data)
     }
   )
 }

@@ -25,7 +25,7 @@ let web3 = new Web3(
 )
 const main = async () => {
   const deployBlockNumber = 11149814
-  const persister = await getPersister('mongodb://localhost:27017/', 'A8')
+  const persister = await getPersister('mongodb://localhost:27017/', 'A9')
 
   const status = await persister.loadStatus(deployBlockNumber)
   console.log(status)
@@ -78,10 +78,7 @@ const main = async () => {
   }
 
   // order is important, we want to process token registration first.
-  const events = [
-    // eventTokenRegistered,
-    eventBlockSubmitted,
-  ]
+  const events = [eventTokenRegistered, eventBlockSubmitted]
 
   events.forEach((evt) => {
     const subscription1 = web3.eth.subscribe(

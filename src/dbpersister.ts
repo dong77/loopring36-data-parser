@@ -10,38 +10,42 @@ async function getPersister(dbUrl, dbName) {
   const client = new MongoClient(url)
 
   await client.connect()
-  await client
-    .db(name)
-    .createCollection('blocks')
-    .catch((err) => {})
 
-  await client
-    .db(name)
-    .createCollection('transactions')
-    .catch((err) => {})
+  const db = client.db(name)
+  await db.createCollection('status').catch((err) => {})
+  await db.createCollection('blocks').catch((err) => {})
+  await db.createCollection('transactions').catch((err) => {})
+  await db.createCollection('accounts').catch((err) => {})
+  await db.createCollection('balances').catch((err) => {})
+  const loadStatus = async (defaultFirstEthBlock) => {
+    const status = await db.collection('status').findOne({ _id: 1 })
 
-  await client
-    .db(name)
-    .createCollection('accounts')
-    .catch((err) => {})
+    console.log('status:', status)
 
-  await client
-    .db(name)
-    .createCollection('balances')
-    .catch((err) => {})
+    return (
+      status || {
+        firstEthBlock: defaultFirstEthBlock,
+        lastAccountID: -1,
+      }
+    )
+  }
 
-  const getState = async () => {
-    return {
-      ethBlock: 0,
-      lastAccountID: 0,
-    }
+  const saveStatus = async (firstEthBlock, lastAccountID) => {
+    await db.collection('status').updateOne(
+      { _id: 1 },
+      {
+        firstEthBlock: firstEthBlock,
+        lastAccountID: lastAccountID,
+      },
+      { upsert: true }
+    )
   }
 
   const persist = async (data) => {
     console.log('persisting block', data.block._id, '...')
   }
 
-  return { client, getState, persist }
+  return { client, loadStatus, saveStatus, persist }
 }
 
 export default getPersister

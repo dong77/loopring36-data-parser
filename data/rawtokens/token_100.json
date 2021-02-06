@@ -1,0 +1,9 @@
+{
+    "_id": 100,
+    "address": "0xd9d681c1ddd462ca222e90bbe14a35273c318a09",
+    "name": "AMM-ETH-DAI",
+    "symbol": "LP-ETH-DAI",
+    "decimals": 8,
+    "blockNumber": 11461730,
+    "timestamp": 1608089898
+}

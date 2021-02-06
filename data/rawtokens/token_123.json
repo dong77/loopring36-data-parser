@@ -1,0 +1,9 @@
+{
+    "_id": 123,
+    "address": "0x85f2e9474d208a11ac18ed2a4e434c4bfc6ddbde",
+    "name": "AMM-OBTC-ETH",
+    "symbol": "LP-OBTC-ETH",
+    "decimals": 8,
+    "blockNumber": 11691899,
+    "timestamp": 1611140739
+}

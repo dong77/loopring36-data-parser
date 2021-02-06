@@ -4,7 +4,7 @@ import { parseLoopringSubmitBlocksTx } from './parse'
 
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
-const extractBlock = async (web3, event, lastAccountID) => {
+const extractBlock = async (web3, event) => {
   const BN = web3.utils.BN
   const block = await web3.eth.getBlock(event.blockNumber)
   const tx = await web3.eth.getTransaction(event.transactionHash)
@@ -36,16 +36,9 @@ const extractBlock = async (web3, event, lastAccountID) => {
   const transactions = []
   const accounts = {}
   const balances = {}
-  const stats = { lastAccountID: lastAccountID }
 
   function addToAccount(accountID, address) {
-    if (
-      accountID !== undefined &&
-      address &&
-      address !== zeroAddr &&
-      accountID > lastAccountID.lastAccountID
-    ) {
-      stats.lastAccountID = accountID
+    if (accountID !== undefined && address && address !== zeroAddr) {
       accounts[accountID] = address
     }
   }
@@ -171,7 +164,6 @@ const extractBlock = async (web3, event, lastAccountID) => {
     accounts: accounts_,
     balances: balances_,
     transactions,
-    stats,
   }
   // console.log(data.accounts)
   return data

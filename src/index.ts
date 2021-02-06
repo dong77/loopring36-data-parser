@@ -22,46 +22,7 @@ const main = async () => {
   )
 
   const status = await persister.loadStatus(11799600)
-  status.nextEthBlock = 11799600
-
   console.log(status)
-
-  // let i = 0
-  // while (i === 0) {
-
-  // const processEvents = async (events, func) => {
-  //   console.log('remaining', events.length)
-  //   if (events.length == 0) return
-  //   else {
-  //     await func(events[0])
-  //     await processEvents(events.slice(1), func)
-  //   }
-  // }
-
-  // web3.eth
-  //   .getPastLogs({
-  //     fromBlock: status.nextEthBlock,
-  //     toBlock: status.nextEthBlock + step,
-  //     address: exchangeV3,
-  //     topics: [eventBlockSubmitted],
-  //   })
-  //   .then(async (events) => {
-  //     await processEvents(events, async (event) => {
-  //       const data = await extractBlock(web3, event)
-  //       await writeJsonFile('./blocks/', data.block._id, data)
-  //       await persister.persist(data)
-  //     })
-
-  //     status.nextEthBlock += step
-  //     console.log('on ethereum block', status.nextEthBlock)
-  //     await persister.saveStatus(status)
-  //   })
-
-  // console.log('done')
-  // // }
-
-  // status.nextEthBlock += 1
-  // await persister.saveStatus(status)
 
   const mutex = new Mutex()
   const subscription = web3.eth.subscribe(
@@ -73,12 +34,11 @@ const main = async () => {
     },
     async (error, event) => {
       await mutex.runExclusive(async () => {
-        const data = await extractBlock(web3, event, status.lastAccountID)
+        const data = await extractBlock(web3, event)
         await writeJsonFile('./blocks/', data.block._id, data)
         await persister.persist(data)
 
         status.nextEthBlock = data.block.blockNumber
-        status.lastAccountID = data.stats.lastAccountID
         await persister.saveStatus(status)
       })
     }

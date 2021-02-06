@@ -23,7 +23,6 @@ async function getPersister(dbUrl, dbName) {
     return (
       status || {
         nextEthBlock: defaultNextEthBlock,
-        lastAccountID: -1,
       }
     )
   }

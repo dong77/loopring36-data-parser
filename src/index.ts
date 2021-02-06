@@ -55,7 +55,9 @@ const main = async () => {
           'operator:',
           data.block.from,
           'height:',
-          data.block.blockNumber
+          data.block.blockNumber,
+          'cached:',
+          data.cached
         )
       } else {
         const token = await extractToken(web3, event)

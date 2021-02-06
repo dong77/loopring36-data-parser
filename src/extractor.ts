@@ -2,22 +2,36 @@ import { TransactionType } from './types'
 import { Bitstream } from './bitstream'
 import { parseLoopringSubmitBlocksTx } from './parse'
 import * as ERC20ABI from './abi/ERC20.abi.json'
+import writeJsonFile from './filepersister'
+
+const fs = require('fs')
 
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
 const extractBlock = async (web3, event) => {
   const BN = web3.utils.BN
-  const block = await web3.eth.getBlock(event.blockNumber)
-  const tx = await web3.eth.getTransaction(event.transactionHash)
+  const _id = parseInt(new BN(event.topics[1].substring(2), 16).toString())
 
-  const dexBlock = { ...event, ...tx }
+  let cached = false
+  let dexBlock
+  let tx
+  try {
+    const rawBlock = JSON.parse(fs.readFile('./rawblocks/', 'block_' + _id))
+    dexBlock = { event: rawBlock.event, tx: rawBlock.tx, _id }
+    tx = rawBlock.tx
+    cached = true
+  } catch (err) {
+    const block = await web3.eth.getBlock(event.blockNumber)
+    tx = await web3.eth.getTransaction(event.transactionHash)
 
-  dexBlock._id = parseInt(
-    new BN(dexBlock.topics[1].substring(2), 16).toString()
-  )
-  dexBlock.dexMerkelRoot = dexBlock.data.substring(0, 64 + 2)
-  dexBlock.dexPublicDataHash = '0x' + dexBlock.data.substring(66)
-  dexBlock.timestamp = block.timestamp
+    dexBlock = { _id, ...event, ...tx }
+
+    if (!fs.existsSync('./rawblocks/')) {
+      fs.mkdirSync('./rawblocks/')
+    }
+
+    await writeJsonFile('./rawblocks/', 'block' + _id, { event, tx, _id })
+  }
 
   delete dexBlock.input
   delete dexBlock.hash
@@ -175,6 +189,7 @@ const extractBlock = async (web3, event) => {
     accounts: accounts_,
     balances: balances_,
     transactions,
+    cached: cached,
   }
   // console.log(data.accounts)
   return data

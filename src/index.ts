@@ -48,7 +48,9 @@ const main = async () => {
           // console.log(event)
           const token = await extractToken(web3, event)
           console.log(token)
-          await persister.persistToken(token)
+          if (token) {
+            await persister.persistToken(token)
+          }
         }
 
         status.nextEthBlock = event.blockNumber

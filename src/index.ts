@@ -43,7 +43,7 @@ const main = async () => {
 
       if (event.topics[0] === eventBlockSubmitted) {
         const data = await extractBlock(web3, event)
-        await writeJsonFile('./blocks/', 'block_' + data.block._id, data)
+        await writeJsonFile('./data/blocks/', 'block_' + data.block._id, data)
         await persister.persistBlock(data)
         console.log(
           'block:',
@@ -58,7 +58,7 @@ const main = async () => {
       } else {
         const token = await extractToken(web3, event)
         if (token) {
-          await writeJsonFile('./tokens/', 'token_' + token._id, token)
+          await writeJsonFile('./data/tokens/', 'token_' + token._id, token)
           await persister.persistToken(token)
           console.log(
             'token:',

@@ -23,59 +23,63 @@ let web3 = new Web3(Web3.givenProvider || geth, {
 })
 
 const main = async () => {
-  const persister = await getPersister('mongodb://localhost:27017/', 'A3')
+  const persister = await getPersister('mongodb://localhost:27017/', 'A5')
 
-  const status = await persister.loadStatus(11799600)
+  const status = await persister.loadStatus(11711600)
   console.log(status)
-  // status.nextEthBlock =
+  status.nextEthBlock = 11711600
 
   const mutex = new Mutex()
-  const subscription = web3.eth.subscribe(
-    'logs',
-    {
-      fromBlock: status.nextEthBlock,
-      address: exchangeV3,
-      topics: [
-        eventBlockSubmitted,
-        // eventTokenRegistered,
-      ],
-    },
-    async (err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      await mutex.runExclusive(async () => {
-        console.log('------------', event)
 
-        if (event.topics[0] === eventBlockSubmitted) {
-          const data = await extractBlock(web3, event)
-          await writeJsonFile(
-            './blocks/',
-            data.block.blockNumber + '-' + data.block._id,
-            data
-          )
-          await persister.persistBlock(data)
-          console.log('block', data.block._id, 'processed')
-        } else {
-          const token = await extractToken(web3, event)
-          if (token) {
-            await writeJsonFile(
-              './tokens/',
-              token.blockNumber + '-' + token._id,
-              token
-            )
-            await persister.persistToken(token)
-            console.log('token registered:', token.address, '/', token._id)
-          }
-        }
-
-        status.nextEthBlock = event.blockNumber
-        await persister.saveStatus(status)
-      })
+  const processEvent = async (err, event) => {
+    if (err) {
+      console.error(err)
+      return
     }
-  )
-  // )
+
+    await mutex.runExclusive(async () => {
+      // console.log('------------', event)
+
+      if (event.topics[0] === eventBlockSubmitted) {
+        const data = await extractBlock(web3, event)
+        await writeJsonFile(
+          './blocks/',
+          data.block.blockNumber + '-' + data.block._id,
+          data
+        )
+        await persister.persistBlock(data)
+        console.log('block', data.block._id, 'processed')
+      } else {
+        const token = await extractToken(web3, event)
+        if (token) {
+          await writeJsonFile(
+            './tokens/',
+            token.blockNumber + '-' + token._id,
+            token
+          )
+          await persister.persistToken(token)
+          console.log('token registered:', token.address, '/', token._id)
+        }
+      }
+
+      status.nextEthBlock = event.blockNumber
+      await persister.saveStatus(status)
+    })
+  }
+
+  const events = [eventBlockSubmitted, eventTokenRegistered]
+
+  events.forEach((evt) => {
+    const subscription1 = web3.eth.subscribe(
+      'logs',
+      {
+        fromBlock: status.nextEthBlock,
+        address: exchangeV3,
+        topics: [evt],
+      },
+      processEvent
+    )
+  })
 }
 
 main()

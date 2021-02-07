@@ -2,12 +2,22 @@ import { TransactionType } from './types'
 import { Bitstream } from './bitstream'
 import { parseLoopringSubmitBlocksTx } from './parse'
 import * as ERC20ABI from './abi/ERC20.abi.json'
-import writeJsonFile from './filepersister'
+import { writeTxtFile, writeJsonFile } from './filepersister'
 
 const fs = require('fs')
 
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
+const feeSettings = {
+  DEPOSIT: 1,
+  WITHDRAWAL: 1,
+  TRANSFER: 1,
+  ACCOUNT_UPDATE: 1,
+  SPOT_TRADE: 1,
+  NOOP: 1,
+  SIGNATURE_VERIFICATION: 1,
+  AMM_UPDATE: 1,
+}
 const extractBlock = async (web3, event) => {
   const BN = web3.utils.BN
   const _id = parseInt(new BN(event.topics[1].substring(2), 16).toString())
@@ -15,24 +25,32 @@ const extractBlock = async (web3, event) => {
   let cached = false
   let dexBlock
   let tx
+  let receipt
   try {
     const rawBlock = JSON.parse(
       fs.readFileSync('./data/rawblocks/block_' + _id + '.json')
     )
     dexBlock = { ...rawBlock.event, ...rawBlock.tx, _id }
     tx = rawBlock.tx
+    receipt = rawBlock.receipt
     cached = true
   } catch (err) {
     const block = await web3.eth.getBlock(event.blockNumber)
     tx = await web3.eth.getTransaction(event.transactionHash)
+    receipt = await web3.eth.getTransactionReceipt(event.transactionHash)
 
-    dexBlock = { _id, ...event, ...tx }
+    dexBlock = { _id, ...event, ...tx, ...receipt }
 
     if (!fs.existsSync('./data/rawblocks/')) {
       fs.mkdirSync('./data/rawblocks/')
     }
 
-    await writeJsonFile('./data/rawblocks/', 'block_' + _id, { event, tx, _id })
+    await writeJsonFile('./data/rawblocks/', 'block_' + _id, {
+      event,
+      tx,
+      receipt,
+      _id,
+    })
   }
 
   delete dexBlock.input
@@ -103,9 +121,12 @@ const extractBlock = async (web3, event) => {
 
   const txs = await parseLoopringSubmitBlocksTx(tx)
 
+  dexBlock.feeRevenue = 0
   txs.forEach((tx, idx) => {
     tx._id = dexBlock._id * 10000 + idx
     tx.block = dexBlock._id
+
+    dexBlock.feeRevenue += feeSettings[tx.type] || 0
 
     transactions.push(tx)
 

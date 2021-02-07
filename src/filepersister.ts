@@ -14,4 +14,16 @@ async function writeJsonFile(directory, blockIdx, data) {
   })
 }
 
-export default writeJsonFile
+async function writeTxtFile(directory, blockIdx, str) {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory)
+  }
+
+  fs.writeFile(directory + '/' + blockIdx + '.txt', str, function (err) {
+    if (err) {
+      console.log(err)
+    }
+  })
+}
+
+export { writeTxtFile, writeJsonFile }

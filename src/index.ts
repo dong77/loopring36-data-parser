@@ -1,7 +1,7 @@
 const Web3 = require('web3')
 import { Mutex } from 'async-mutex'
 import { TransactionType } from './types'
-import writeJsonFile from './filepersister'
+import { writeTxtFile, writeJsonFile } from './filepersister'
 import getPersister from './dbpersister'
 import { zeroAddr, extractBlock, extractToken } from './extractor'
 
@@ -25,13 +25,16 @@ let web3 = new Web3(
 )
 const main = async () => {
   const deployBlockNumber = 11149814
-  const persister = await getPersister('mongodb://localhost:27017/', 'A9')
+  // const persister = await getPersister('mongodb://localhost:27017/', 'A9')
 
-  const status = await persister.loadStatus(deployBlockNumber)
-  console.log(status)
-  status.nextEthBlock = deployBlockNumber
+  // const status = await persister.loadStatus(deployBlockNumber)
+  // console.log(status)
+  const status = { nextEthBlock: deployBlockNumber }
 
   const mutex = new Mutex()
+  var totalProfit = 0
+
+  var fees = ''
 
   const processEvent = async (err, event) => {
     if (err) {
@@ -44,8 +47,18 @@ const main = async () => {
 
       if (event.topics[0] === eventBlockSubmitted) {
         const data = await extractBlock(web3, event)
+        totalProfit += data.block.feeRevenue - data.block.gasUsed
+        fees =
+          fees +
+          data.block._id +
+          ',' +
+          data.block.feeRevenue +
+          ',' +
+          data.block.gasUsed +
+          '\n'
         await writeJsonFile('./data/blocks/', 'block_' + data.block._id, data)
-        await persister.persistBlock(data)
+        await writeTxtFile('./data/', 'feestats', fees + totalProfit)
+        // await persister.persistBlock(data)
         console.log(
           'block:',
           data.block._id,
@@ -62,7 +75,7 @@ const main = async () => {
           await writeJsonFile('./data/tokens/', 'token_' + token._id, token)
           const cached = token.cached || false
           delete token.cached
-          await persister.persistToken(token)
+          // await persister.persistToken(token)
           console.log(
             'token:',
             token.address,
@@ -77,12 +90,16 @@ const main = async () => {
       }
 
       status.nextEthBlock = event.blockNumber + 1
-      await persister.saveStatus(status)
+      // await persister.saveStatus(status)
     })
   }
 
   // order is important, we want to process token registration first.
-  const events = [eventTokenRegistered, eventBlockSubmitted]
+  const events = [
+    // eventTokenRegistered,
+
+    eventBlockSubmitted,
+  ]
 
   events.forEach((evt) => {
     const subscription1 = web3.eth.subscribe(

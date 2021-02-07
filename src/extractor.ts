@@ -9,14 +9,14 @@ const fs = require('fs')
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
 const feeSettings = {
-  DEPOSIT: 1,
-  WITHDRAWAL: 1,
-  TRANSFER: 1,
-  ACCOUNT_UPDATE: 1,
-  SPOT_TRADE: 1,
+  DEPOSIT: 782,
+  WITHDRAWAL: 58782,
+  TRANSFER: 1582,
+  ACCOUNT_UPDATE: 1582,
+  SPOT_TRADE: 1582,
   NOOP: 1,
   SIGNATURE_VERIFICATION: 1,
-  AMM_UPDATE: 1,
+  AMM_UPDATE: 53290 / 2,
 }
 const extractBlock = async (web3, event) => {
   const BN = web3.utils.BN
@@ -30,9 +30,10 @@ const extractBlock = async (web3, event) => {
     const rawBlock = JSON.parse(
       fs.readFileSync('./data/rawblocks/block_' + _id + '.json')
     )
-    dexBlock = { ...rawBlock.event, ...rawBlock.tx, _id }
+
     tx = rawBlock.tx
     receipt = rawBlock.receipt
+    dexBlock = { _id, ...rawBlock.event, ...rawBlock.tx, ...receipt }
     cached = true
   } catch (err) {
     const block = await web3.eth.getBlock(event.blockNumber)

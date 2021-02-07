@@ -1,9 +1,0 @@
-{
-    "_id": 110,
-    "address": "0x1d28b287b5e19b12ac2b3618405c57ad882a4d74",
-    "name": "AMM-WOO-USDT",
-    "symbol": "LP-WOO-USDT",
-    "decimals": 8,
-    "blockNumber": 11559763,
-    "timestamp": 1609389324
-}

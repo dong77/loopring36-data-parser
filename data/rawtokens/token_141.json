@@ -1,9 +1,0 @@
-{
-    "_id": 141,
-    "address": "0x2eab3234ea1e4c9571c2e011f435c7316ececdb9",
-    "name": "AMM-CRV-ETH",
-    "symbol": "LP-CRV-ETH",
-    "decimals": 8,
-    "blockNumber": 11697573,
-    "timestamp": 1611216029
-}

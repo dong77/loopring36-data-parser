@@ -57,9 +57,11 @@ const extractBlock = async (web3, event) => {
   delete dexBlock.input
   delete dexBlock.hash
   delete dexBlock.data
+  delete dexBlock.logsBloom
   delete dexBlock.topics
   delete dexBlock.id
   delete dexBlock.nonce
+  delete dexBlock.gas
   delete dexBlock.value
   delete dexBlock.r
   delete dexBlock.s
@@ -122,12 +124,9 @@ const extractBlock = async (web3, event) => {
 
   const txs = await parseLoopringSubmitBlocksTx(tx)
 
-  dexBlock.feeRevenue = 0
   txs.forEach((tx, idx) => {
     tx._id = dexBlock._id * 10000 + idx
     tx.block = dexBlock._id
-
-    dexBlock.feeRevenue += feeSettings[tx.type] || 0
 
     transactions.push(tx)
 

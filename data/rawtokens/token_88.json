@@ -1,9 +1,0 @@
-{
-    "_id": 88,
-    "address": "0x9b7a20ae12a3f2a3d4cf9ea2d4a8518c104cc5f2",
-    "name": "AMM-UNI-ETH",
-    "symbol": "LP-UNI-ETH",
-    "decimals": 8,
-    "blockNumber": 11418338,
-    "timestamp": 1607512777
-}

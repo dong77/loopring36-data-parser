@@ -32,9 +32,6 @@ const main = async () => {
   const status = { nextEthBlock: deployBlockNumber }
 
   const mutex = new Mutex()
-  var totalProfit = 0
-
-  var fees = 'block,revenue,cost\n'
 
   const processEvent = async (err, event) => {
     if (err) {
@@ -47,17 +44,8 @@ const main = async () => {
 
       if (event.topics[0] === eventBlockSubmitted) {
         const data = await extractBlock(web3, event)
-        totalProfit += data.block.feeRevenue - data.block.gasUsed
-        fees =
-          fees +
-          data.block._id +
-          ',' +
-          data.block.feeRevenue +
-          ',' +
-          data.block.gasUsed +
-          '\n'
+
         await writeJsonFile('./data/blocks/', 'block_' + data.block._id, data)
-        await writeTxtFile('./data/', 'feestats.csv', fees + totalProfit)
         // await persister.persistBlock(data)
         console.log(
           'block:',

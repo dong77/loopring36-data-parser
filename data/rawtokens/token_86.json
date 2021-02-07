@@ -1,9 +1,0 @@
-{
-    "_id": 86,
-    "address": "0x605872a5a459e778959b8a49dc3a56a8c9197983",
-    "name": "AMM-ETH-USDT",
-    "symbol": "LP-ETH-USDT",
-    "decimals": 8,
-    "blockNumber": 11410096,
-    "timestamp": 1607403420
-}

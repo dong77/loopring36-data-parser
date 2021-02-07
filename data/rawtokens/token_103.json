@@ -1,9 +1,0 @@
-{
-    "_id": 103,
-    "address": "0x746eeb6bdd9139a4d605c2c410911f37bea9093b",
-    "name": "AMM-HBTC-USDT",
-    "symbol": "LP-HBTC-USDT",
-    "decimals": 8,
-    "blockNumber": 11508238,
-    "timestamp": 1608705706
-}

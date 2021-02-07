@@ -1,9 +1,0 @@
-{
-    "_id": 111,
-    "address": "0x1f78cd24ccf73fdd5095d0339dd6ef72e30669ac",
-    "name": "AMM-HBTC-ETH",
-    "symbol": "LP-HBTC-ETH",
-    "decimals": 8,
-    "blockNumber": 11559841,
-    "timestamp": 1609390491
-}

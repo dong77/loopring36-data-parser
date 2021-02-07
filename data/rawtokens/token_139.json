@@ -1,9 +1,0 @@
-{
-    "_id": 139,
-    "address": "0x636a3141d48402d06a907aa14f023e8f5b5d634f",
-    "name": "AMM-RENBTC-ETH",
-    "symbol": "LP-RENBTC-ETH",
-    "decimals": 8,
-    "blockNumber": 11697565,
-    "timestamp": 1611215924
-}

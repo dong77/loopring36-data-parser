@@ -1,9 +1,0 @@
-{
-    "_id": 87,
-    "address": "0xf6cd964e6345e8f01e548063de13d0de7d8c59de",
-    "name": "AMM-WBTC-ETH",
-    "symbol": "LP-WBTC-ETH",
-    "decimals": 8,
-    "blockNumber": 11410134,
-    "timestamp": 1607403974
-}

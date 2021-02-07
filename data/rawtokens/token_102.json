@@ -1,9 +1,0 @@
-{
-    "_id": 102,
-    "address": "0xe6cc0d45c4e4f81be340f4d176e6ce0d63ad5743",
-    "name": "AMM-LRC-USDT",
-    "symbol": "LP-LRC-USDT",
-    "decimals": 8,
-    "blockNumber": 11508200,
-    "timestamp": 1608705317
-}

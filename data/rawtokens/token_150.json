@@ -1,9 +1,0 @@
-{
-    "_id": 150,
-    "address": "0x24e4cf9b1723e5a5401841d931a301aedecd96ef",
-    "name": "AMM-DOUGH-ETH",
-    "symbol": "LP-DOUGH-ETH",
-    "decimals": 8,
-    "blockNumber": 11781129,
-    "timestamp": 1612326458
-}

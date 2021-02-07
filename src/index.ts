@@ -34,7 +34,7 @@ const main = async () => {
   const mutex = new Mutex()
   var totalProfit = 0
 
-  var fees = ''
+  var fees = 'block,revenue,cost\n'
 
   const processEvent = async (err, event) => {
     if (err) {
@@ -57,7 +57,7 @@ const main = async () => {
           data.block.gasUsed +
           '\n'
         await writeJsonFile('./data/blocks/', 'block_' + data.block._id, data)
-        await writeTxtFile('./data/', 'feestats', fees + totalProfit)
+        await writeTxtFile('./data/', 'feestats.csv', fees + totalProfit)
         // await persister.persistBlock(data)
         console.log(
           'block:',

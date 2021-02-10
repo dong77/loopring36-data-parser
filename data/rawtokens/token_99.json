@@ -1,0 +1,9 @@
+{
+    "_id": 99,
+    "address": "0x8efad07720d331a49f5db2cc83946f7dc8fc6b42",
+    "name": "AMM-AC-ETH",
+    "symbol": "LP-AC-ETH",
+    "decimals": 8,
+    "blockNumber": 11461694,
+    "timestamp": 1608089331
+}

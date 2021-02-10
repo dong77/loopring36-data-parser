@@ -1,0 +1,9 @@
+{
+    "_id": 112,
+    "address": "0xf88de0ccd1e84898b4ea62c421009996bfb6156e",
+    "name": "AMM-ETH-USDC",
+    "symbol": "LP-ETH-USDC",
+    "decimals": 8,
+    "blockNumber": 11645496,
+    "timestamp": 1610525592
+}

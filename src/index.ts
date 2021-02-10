@@ -4,7 +4,6 @@ import { TransactionType } from './types'
 import { writeTxtFile, writeJsonFile } from './filepersister'
 import getPersister from './dbpersister'
 import { zeroAddr, extractBlock, extractToken } from './extractor'
-
 const geth = 'wss://mainnet.infura.io/ws/v3/3cdee1310ccc4e9fbb19bf8d9967358e'
 
 // const exchangeOwner = '0x42bc1ab51b7af89cfaa88a7291ce55971d8cb83a'
@@ -23,6 +22,34 @@ let web3 = new Web3(
     },
   })
 )
+
+const sleep = (milliseconds) => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
+}
+
+const events = [
+  eventTokenRegistered, //
+  eventBlockSubmitted,
+]
+
+const subscriptions = []
+
+const subscribe = async (func, nextEthBlock) => {
+  events.forEach((evt) => {
+    let sub = web3.eth.subscribe(
+      'logs',
+      {
+        fromBlock: nextEthBlock,
+        address: exchangeV3,
+        topics: [evt],
+      },
+      func
+    )
+
+    subscriptions.push(sub)
+  })
+}
+
 const main = async () => {
   const deployBlockNumber = 11149814
   // const persister = await getPersister('mongodb://localhost:27017/', 'A9')
@@ -35,7 +62,20 @@ const main = async () => {
 
   const processEvent = async (err, event) => {
     if (err) {
+      console.log('=-------------------->')
       console.error(err)
+      subscriptions.forEach((sub) => {
+        if (sub) {
+          sub.unsubscribe()
+        }
+      })
+
+      subscriptions.splice(0, subscriptions.length)
+      console.log('subscriptions:', subscriptions.length)
+
+      await sleep(2000)
+
+      await subscribe(processEvent, status.nextEthBlock)
       return
     }
 
@@ -83,23 +123,8 @@ const main = async () => {
   }
 
   // order is important, we want to process token registration first.
-  const events = [
-    // eventTokenRegistered,
 
-    eventBlockSubmitted,
-  ]
-
-  events.forEach((evt) => {
-    const subscription1 = web3.eth.subscribe(
-      'logs',
-      {
-        fromBlock: status.nextEthBlock,
-        address: exchangeV3,
-        topics: [evt],
-      },
-      processEvent
-    )
-  })
+  await subscribe(processEvent, status.nextEthBlock)
 }
 
 main()
